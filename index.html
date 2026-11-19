@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f4a33">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Bar Golf">
+<title>Bar Golf</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+:root{color-scheme:light dark;
+--bg:light-dark(#eef2ec,#0a1510);--card:light-dark(#ffffff,#13241c);--ink:light-dark(#0f1f17,#e9f1ec);
+--mute:light-dark(#5b6b62,#9db3a7);--green:light-dark(#0f4a33,#0d3524);--line:light-dark(#d9e2db,#25392e);
+--soft:light-dark(#e5efe8,#1a3326);--red:#e2412f;--gold:light-dark(#9a6b00,#f2c14e);--ok:light-dark(#1f8a4c,#5fd08f);
+--st:env(safe-area-inset-top,0px);--sb:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box;min-width:0;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Archivo,system-ui,sans-serif;overflow-x:clip}
+button,input{font:inherit;color:inherit}
+[hidden]{display:none!important}
+ol,ul{list-style:none;margin:0;padding:0}
+.top{position:sticky;top:0;z-index:20;background:var(--green);color:#f3f8f4;padding:calc(var(--st) + 12px) 16px 12px}
+.top .in{max-width:720px;margin:0 auto;display:flex;align-items:center;gap:10px}
+.top h1{font-size:20px;margin:0;line-height:1.15;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.top small{display:block;font-size:13px;font-weight:400;color:#bcd6c6}
+.ib{min-height:40px;padding:0 12px;border-radius:999px;border:1px solid rgba(255,255,255,.35);background:transparent;color:#fff;font-weight:600;cursor:pointer;white-space:nowrap}
+main{max-width:720px;margin:0 auto;padding:14px 12px calc(96px + var(--sb))}
+main.full{padding-bottom:24px}
+h2{font-size:22px;margin:22px 0 10px;font-weight:800;line-height:1.15}
+h2:first-child{margin-top:4px}
+.hero{background:var(--green);color:#f3f8f4;border-radius:20px;padding:22px 18px;margin-bottom:14px}
+.hero h1{font-size:32px;line-height:1.05;margin:0 0 6px}
+.hero p{margin:0;color:#bcd6c6}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;border-radius:12px;border:0;background:var(--green);color:#fff;font-weight:600;text-decoration:none;cursor:pointer;padding:0 14px;text-align:center}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn.red{background:var(--red)}
+.btn:disabled{opacity:.5;cursor:default}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+form{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+form input{flex:1 1 160px;font-size:16px;min-height:46px;border-radius:12px;border:1px solid var(--line);background:var(--bg);padding:0 12px}
+.note{margin:6px 0 0;font-size:14px;color:var(--mute)}
+.warn{margin:8px 0 0;font-size:14px;color:var(--red);font-weight:600}
+.dot{display:inline-block;width:12px;height:12px;border-radius:50%;flex:none}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--soft);border:0;border-radius:999px;padding:6px 14px;font-weight:600;min-height:40px;cursor:pointer}
+.chip.x{padding-right:4px;cursor:default}
+.chip.x button{width:34px;height:34px;border:0;border-radius:50%;background:transparent;font-size:18px;color:var(--mute);cursor:pointer}
+.av{flex:none;width:34px;height:34px;border-radius:50%;object-fit:cover;display:inline-grid;place-items:center;font-weight:800;font-size:13px;color:#fff}
+.av.s{width:26px;height:26px;font-size:11px}
+/* progress */
+.prog{background:var(--green);color:#f3f8f4;border-radius:16px;padding:14px 16px;margin-bottom:12px}
+.prog b{display:block;font-size:22px;line-height:1.15}
+.prog span{font-size:14px;color:#bcd6c6}
+.bar{height:8px;border-radius:8px;background:rgba(255,255,255,.18);overflow:hidden;margin-top:10px}
+.bar i{display:block;height:100%;background:var(--red);border-radius:8px;transition:width .3s}
+.flags{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap}
+.flags a{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:14px;text-decoration:none;color:#fff;border:2px solid rgba(255,255,255,.6)}
+.flags a.d{background:#f3f8f4;color:var(--green);border-color:#f3f8f4}.flags a.c{background:var(--red);border-color:#fff}
+/* holes */
+.hole{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px;scroll-margin-top:calc(var(--st) + 80px)}
+.hole.now{border:2px solid var(--red);box-shadow:0 6px 22px -12px rgba(226,65,47,.6)}
+.hole.done{background:var(--soft)}
+.hd{display:flex;gap:12px;align-items:flex-start}
+.num{flex:none;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-weight:800;background:var(--green);color:#fff;font-size:17px}
+.now .num{background:var(--red)}.done .num{background:transparent;color:var(--ok);border:2px solid var(--ok)}
+.tt{flex:1}
+h3{margin:0;font-size:19px;line-height:1.2}
+.addr{margin:2px 0 0;color:var(--mute);font-size:14px}
+.par{flex:none;font-size:13px;color:var(--mute);text-align:center;line-height:1.1}
+.par b{display:block;font-size:24px;color:var(--ink)}
+.drink{margin:10px 0 0;font-weight:600;font-size:17px}
+.drink span{font-weight:400;color:var(--mute);font-size:13px;margin-right:6px}
+.herenow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:10px;font-size:14px;color:var(--mute)}
+.seg{display:flex;gap:6px;margin-top:10px}
+.seg button{flex:1;min-height:42px;border-radius:10px;border:1px solid var(--line);background:transparent;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--green);color:#fff;border-color:var(--green)}
+.sc{margin-top:12px;border-top:1px solid var(--line)}
+.sc li{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--line);min-height:57px}
+.pn{flex:1;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.st{width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--bg);font-size:22px;font-weight:600;cursor:pointer;touch-action:manipulation}
+output{width:40px;text-align:center;font-size:22px;font-weight:800;font-variant-numeric:tabular-nums}
+output.nil{color:var(--mute);font-weight:400}output.under{color:var(--ok)}output.over{color:var(--red)}
+.act{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+/* board */
+.lb li{display:grid;grid-template-columns:24px minmax(0,1fr) auto;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.lb li:last-child{border-bottom:0}
+.rk{font-weight:800;color:var(--mute);font-size:18px}.lb li:first-child .rk{color:var(--gold)}
+.tn{font-weight:800;font-size:17px;display:flex;align-items:center;gap:8px}
+.mem,.where{display:block;font-size:13px;color:var(--mute)}
+.vp{font-weight:800;font-size:22px;min-width:56px;text-align:right;font-variant-numeric:tabular-nums;line-height:1.1}
+.vp small{display:block;font-size:12px;font-weight:400;color:var(--mute);white-space:nowrap}
+.mine{background:var(--soft);border-radius:12px;padding-inline:8px!important;margin-inline:-8px}
+/* feed */
+.feed li{display:flex;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
+.feed li:last-child{border-bottom:0}
+.feed p{margin:0;font-size:15px}.feed time{font-size:13px;color:var(--mute);white-space:nowrap}
+.feed img.ph{display:block;width:100%;max-height:440px;object-fit:cover;border-radius:12px;margin-top:8px;background:var(--soft)}
+/* map */
+#mapWrap{position:fixed;left:0;right:0;top:calc(var(--st) + 64px);bottom:calc(64px + var(--sb));z-index:5}
+#map{position:absolute;inset:0;background:var(--soft)}
+.mapbar{position:absolute;left:10px;right:10px;bottom:10px;z-index:500;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;font-size:14px;display:flex;gap:10px;align-items:center;box-shadow:0 6px 20px -10px rgba(0,0,0,.4)}
+.mapbar span{flex:1}
+.pin{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:#0f4a33;color:#fff;font:800 13px Archivo,sans-serif;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.35)}
+.tpin{display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;color:#fff;font:700 12px Archivo,sans-serif;border:2px solid #fff;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.35)}
+/* nav */
+nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--card);border-top:1px solid var(--line);padding-bottom:var(--sb)}
+nav .in{max-width:720px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
+nav button{min-height:64px;border:0;background:transparent;color:var(--mute);font-weight:600;font-size:13px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+nav button svg{width:24px;height:24px}
+nav button[aria-current=true]{color:var(--red)}
+/* sheet, dialog, toast */
+.ov{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--bg);width:100%;max-width:720px;max-height:88vh;overflow:auto;border-radius:20px 20px 0 0;padding:18px 14px calc(18px + var(--sb))}
+.dlg{align-items:center;padding:20px}.dlg .card{max-width:360px;width:100%}.dlg p{margin:0 0 14px;font-weight:600}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(80px + var(--sb));z-index:80;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:14px;max-width:90vw;text-align:center}
+.row{display:flex;gap:10px;align-items:center}
+.sw{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:46px}
+.sw input{width:24px;height:24px;accent-color:var(--green)}
+.empty{color:var(--mute);margin:0;padding:6px 0}
+@media(max-width:380px){.act{grid-template-columns:1fr}.st{width:40px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style></head><body>
+<div id="topbar" hidden></div>
+<main id="view"></main>
+<div id="mapWrap" hidden><div id="map"></div><div class="mapbar" id="mapbar"></div></div>
+<nav id="nav" hidden><div class="in">
+  <button data-tab="holes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 21V3l11 4-11 4"/></svg>Holes</button>
+  <button data-tab="board"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M12 20V4M20 20v-7"/></svg>Board</button>
+  <button data-tab="map"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Map</button>
+  <button data-tab="feed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="15" rx="3"/><circle cx="12" cy="12.5" r="3.5"/><path d="M8 5l1.5-2h5L16 5"/></svg>Feed</button>
+</div></nav>
+<div id="ovl"></div>
+<div id="toast" hidden></div>
+<input type="file" id="file" accept="image/*" hidden>
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+{
+const H=[
+ {par:3,drink:'Guinness or Hard Ice Tea',b:{name:'Lucky Lou',addr:'158 Kloof St, Gardens',lat:-33.9366703,lng:18.4047433,closed:[]}},
+ {par:3,drink:'Aperol Sour',b:{name:'The Dark Horse',addr:'145 Kloof St, Gardens',lat:-33.9343684,lng:18.4073765,closed:[0,1]}},
+ {par:3,drink:'Hard Lemonade',b:{name:'Aruba',addr:'108 Kloof St, Gardens',lat:-33.9341033,lng:18.4071816,closed:[1]}},
+ {par:2,drink:'House wine',b:{name:'Van Hunks',addr:'1 Upper Union St, Gardens',lat:-33.9319701,lng:18.4085938,closed:[]}},
+ {par:3,drink:'Brandy Coke',note:'Yours Truly and Blondie are right next to each other. Pick one for the whole game.',
+  b:{name:'Yours Truly',addr:'73 Kloof St, Gardens',lat:-33.9302078,lng:18.4109002,closed:[]},
+  alt:{name:'Blondie',addr:'69 Kloof St, Gardens',lat:-33.9301436,lng:18.411004,closed:[1]}},
+ {par:1,drink:'Springbok shot',b:{name:"Tiger's Milk",addr:'55 Kloof St, Gardens',lat:-33.9292781,lng:18.4116503,closed:[]}},
+ {par:2,drink:'Corona',b:{name:'The Fat Cactus',addr:'5 Park Rd, Gardens',lat:-33.9287646,lng:18.4107849,closed:[]}},
+ {par:3,drink:'Skinny Bitch',b:{name:'The Power & The Glory',addr:'13d Kloof Nek Rd, Tamboerskloof',lat:-33.9299367,lng:18.4081287,closed:[]}},
+ {par:2,drink:'Savanna',note:'About 15 to 20 minutes on foot from hole 8. An Uber makes sense here.',
+  b:{name:'The Athletic Club & Social',addr:'35 Buitengracht St, CBD',lat:-33.9194999,lng:18.4188692,closed:[0]}}
+];
+const COLORS=['#e2412f','#2f6fe2','#d99a00','#8e44ad','#139a74','#d35400','#c2185b','#34495e','#0097a7','#6d8b00'];
+const $=q=>document.querySelector(q);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>crypto.randomUUID?crypto.randomUUID():'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0;return(c==='x'?r:(r&3|8)).toString(16)});
+const tm=t=>{const d=new Date(t);return isNaN(d)?'':d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})};
+const fmt=v=>{v=Math.round(v*10)/10;return v===0?'E':v>0?'+'+v:'−'+Math.abs(v)};
+const today=new Date().getDay();
+const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+const ls={get:k=>{try{return localStorage.getItem(k)}catch(e){return null}},set:(k,v)=>{try{v==null?localStorage.removeItem(k):localStorage.setItem(k,v)}catch(e){}}};
+const CFG=window.BARGOLF_CONFIG||{};
+const configured=CFG.url&&CFG.key&&!/YOUR_/.test(CFG.url+CFG.key);
+let sb=null,chan=null,code=null,tab=ls.get('bg-tab')||'holes',needRender=false,sheet=null;
+const S={game:null,teams:[],players:[],posts:[],loaded:false};
+const pend={},timers={};
+
+/* ---------- helpers ---------- */
+const meId=()=>code?ls.get('bg-me-'+code):null;
+const me=()=>S.players.find(p=>p.id===meId())||null;
+const myTeam=()=>{const m=me();return m?S.teams.find(t=>t.id===m.team_id)||null:null};
+const members=tid=>S.players.filter(p=>p.team_id===tid).sort((a,b)=>String(a.created_at).localeCompare(String(b.created_at)));
+const scoresOf=p=>pend[p.id]||p.scores||{};
+const doneOf=t=>(t&&t.done)||{};
+const curOf=t=>{if(!t)return 0;for(let i=0;i<9;i++)if(!doneOf(t)[i])return i;return 9};
+const locOf=t=>t&&t.here&&t.here.h>=0&&t.here.h<9&&!doneOf(t)[t.here.h]?+t.here.h:null;
+const bar=i=>i===4&&S.game&&S.game.h5==='bl'?H[4].alt:H[i].b;
+const col=t=>COLORS[(t&&+t.color||0)%COLORS.length];
+const ini=n=>String(n||'?').trim().split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase();
+const av=(p,sm)=>{if(!p)return '';const t=S.teams.find(x=>x.id===p.team_id);
+  return p.avatar&&/^https:\/\//.test(p.avatar)?`<img class="av${sm?' s':''}" src="${esc(p.avatar)}" alt="">`:`<span class="av${sm?' s':''}" style="background:${col(t)}" aria-hidden="true">${esc(ini(p.name))}</span>`};
+const stats=t=>{const ms=members(t.id);let vp=0,sips=0,n=0;ms.forEach(p=>{const s=scoresOf(p);H.forEach((h,i)=>{const v=+s[i];if(v>0){vp+=v-h.par;sips+=v;n++}})});
+  return{vp,sips,n,avg:ms.length?vp/ms.length:0,holes:Object.keys(doneOf(t)).length,size:ms.length}};
+const status=t=>{const l=locOf(t);if(l!=null)return `At ${bar(l).name} since ${tm(t.here.t)}`;
+  let last=-1,lt=0;const d=doneOf(t);for(let i=0;i<9;i++)if(d[i]&&d[i]>lt){lt=d[i];last=i}
+  if(last<0)return 'Not started yet';const c=curOf(t);if(c>8)return `Finished all 9 at ${tm(lt)}`;
+  return `Left ${bar(last).name} at ${tm(lt)}, heading to ${bar(c).name}`};
+const mapsUrl=b=>`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(b.name+', '+b.addr+', Cape Town')}`;
+let toastT;const toast=t=>{const el=$('#toast');el.textContent=t;el.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>el.hidden=true,3200)};
+const shareUrl=()=>location.origin+location.pathname+'?g='+code;
+
+/* ---------- data ---------- */
+async function q(p){const r=await p;if(r&&r.error)throw r.error;return r?r.data:null}
+async function load(){
+  if(!code)return;
+  try{
+    const [g,t,p,po]=await Promise.all([q(sb.from('games').select('*').eq('id',code)),q(sb.from('teams').select('*').eq('game_id',code)),q(sb.from('players').select('*').eq('game_id',code)),q(sb.from('posts').select('*').eq('game_id',code))]);
+    S.game=(g||[])[0]||null;S.teams=(t||[]).sort((a,b)=>String(a.created_at).localeCompare(String(b.created_at)));S.players=p||[];
+    S.posts=(po||[]).sort((a,b)=>String(b.created_at).localeCompare(String(a.created_at))).slice(0,200);S.loaded=true;
+  }catch(e){toast('No connection to the game right now.')}
+  render();
+}
+let lt;const sched=()=>{clearTimeout(lt);lt=setTimeout(load,250)};
+function subscribe(){
+  if(chan)sb.removeChannel(chan);
+  chan=sb.channel('game-'+code);
+  ['games','teams','players','posts'].forEach(tb=>chan.on('postgres_changes',{event:'*',schema:'public',table:tb},sched));
+  chan.subscribe();
+}
+async function run(p,msg){try{await q(p)}catch(e){console.error(e);toast(msg||'That did not save. Try again.');sched()}}
+function savePlayerScores(p,s){pend[p.id]=s;render();clearTimeout(timers[p.id]);
+  timers[p.id]=setTimeout(async()=>{const v=pend[p.id];await run(sb.from('players').update({scores:v}).eq('id',p.id));if(pend[p.id]===v){delete pend[p.id];const x=S.players.find(y=>y.id===p.id);if(x)x.scores=v}},400)}
+function patchTeam(t,obj){Object.assign(t,obj);render();return run(sb.from('teams').update(obj).eq('id',t.id))}
+function post(o){const row={id:uid(),game_id:code,created_at:new Date().toISOString(),...o};S.posts.unshift(row);render();
+  const {created_at,...ins}=row;return run(sb.from('posts').insert(ins))}
+async function shrink(file,max){const url=URL.createObjectURL(file);
+  try{const img=new Image();img.src=url;await img.decode();const k=Math.min(1,max/Math.max(img.naturalWidth,img.naturalHeight)),c=document.createElement('canvas');
+    c.width=Math.round(img.naturalWidth*k);c.height=Math.round(img.naturalHeight*k);c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+    return await new Promise(r=>c.toBlob(b=>r(b||file),'image/jpeg',.82))}catch(e){return file}finally{URL.revokeObjectURL(url)}}
+async function upload(file,max){const blob=await shrink(file,max),path=`${code}/${uid()}.jpg`;
+  const r=await sb.storage.from('photos').upload(path,blob,{contentType:'image/jpeg'});if(r.error)throw r.error;
+  return sb.storage.from('photos').getPublicUrl(path).data.publicUrl}
+
+/* ---------- screens ---------- */
+function vSetup(){return `<div class="hero"><h1>Almost there</h1><p>The app is not connected to a database yet.</p></div>
+<div class="card"><p style="margin:0">Open <b>config.js</b> and paste your Supabase URL and anon key, then deploy again. The setup guide in the folder walks you through it.</p></div>`}
+function vStart(){const last=ls.get('bg-last');return `<div class="hero"><h1>Kloof Street Bar Golf</h1><p>9 holes, par 22. Teams, live scores, photos and a map of who is where.</p></div>
+${last?`<div class="card"><b>Continue your last game</b><div class="act" style="grid-template-columns:1fr"><button class="btn" data-act="open" data-code="${esc(last)}">Open game ${esc(last)}</button></div></div>`:''}
+<div class="card"><b>Start a new game</b><p class="note">You get a link to send to everyone.</p><form id="fNew"><input id="gName" maxlength="40" placeholder="Game name, e.g. CEMS Bar Golf" required><button class="btn">Create</button></form></div>
+<div class="card"><b>Join with a code</b><form id="fJoin"><input id="gCode" maxlength="8" placeholder="Code" autocapitalize="characters" autocomplete="off" required><button class="btn">Join</button></form></div>`}
+function vWho(){
+  if(!S.loaded)return '<p class="empty">Loading the game…</p>';
+  if(!S.game)return `<div class="hero"><h1>Game not found</h1><p>Check the code ${esc(code)}.</p></div><button class="btn ghost" data-act="leave">Back</button>`;
+  return `<div class="hero"><h1>${esc(S.game.name)}</h1><p>Who are you? Tap your name, join a team or create a new one.</p></div>
+${S.teams.map(t=>{const ms=members(t.id);return `<div class="card"><div class="tn"><span class="dot" style="background:${col(t)}"></span>${esc(t.name)}</div>
+<div class="chips">${ms.map(p=>`<button class="chip" data-act="claim" data-p="${esc(p.id)}">${av(p,1)}${esc(p.name)}</button>`).join('')||'<span class="note">No players yet.</span>'}</div>
+<form data-form="addme" data-t="${esc(t.id)}"><input maxlength="20" placeholder="Your name" required aria-label="Your name"><button class="btn ghost">Join ${esc(t.name)}</button></form></div>`}).join('')}
+<div class="card"><b>Create a team</b><form id="fTeam"><input id="tName" maxlength="24" placeholder="Team name" required><input id="tMe" maxlength="20" placeholder="Your name" required><button class="btn">Create team</button></form></div>
+<p class="note" style="text-align:center">Game code <b>${esc(code)}</b></p>`}
+function vHoles(){
+  const t=myTeam(),c=curOf(t),ms=t?members(t.id):[],n=Object.keys(doneOf(t)).length;
+  const teamsAt=i=>S.teams.filter(x=>locOf(x)===i);
+  return `<div class="prog"><b>${c>8?'Round complete':`Hole ${c+1}: ${esc(bar(c).name)}`}</b><span>${esc(t?t.name:'')}, ${n} of 9 done</span>
+<div class="bar"><i style="width:${n/9*100}%"></i></div>
+<div class="flags">${H.map((h,i)=>`<a href="#h${i+1}" class="${doneOf(t)[i]?'d':i===c?'c':''}" aria-label="Hole ${i+1}">${i+1}</a>`).join('')}</div></div>
+${H.map((h,i)=>{const b=bar(i),closed=b.closed.includes(today),here=teamsAt(i),done=!!doneOf(t)[i],isHere=locOf(t)===i;
+return `<section class="hole${done?' done':''}${i===c?' now':''}" id="h${i+1}">
+<div class="hd"><span class="num">${i+1}</span><div class="tt"><h3>${esc(b.name)}</h3><p class="addr">${esc(b.addr)}</p></div><span class="par">Par<b>${h.par}</b></span></div>
+<p class="drink"><span>Drink</span>${esc(h.drink)}</p>
+${i===4?`<div class="seg" role="group" aria-label="Bar for hole 5"><button data-act="h5" data-v="yt" aria-pressed="${S.game.h5!=='bl'}">Yours Truly</button><button data-act="h5" data-v="bl" aria-pressed="${S.game.h5==='bl'}">Blondie</button></div>`:''}
+${closed?'<p class="warn">Usually closed today. Check before you go.</p>':''}
+${h.note?`<p class="note">${h.note}</p>`:''}
+${here.length?`<div class="herenow">${here.map(x=>`<span class="dot" style="background:${col(x)}"></span>${esc(x.name)}`).join(', ')}<span>here now</span></div>`:''}
+<ul class="sc">${ms.map(p=>{const v=scoresOf(p)[i],cl=v==null?'nil':v<h.par?'under':v>h.par?'over':'even';
+ return `<li>${av(p,1)}<span class="pn">${esc(p.name)}</span><button class="st" data-act="step" data-d="-1" data-i="${i}" data-p="${esc(p.id)}" aria-label="One sip less for ${esc(p.name)}">−</button><output class="${cl}">${v??'·'}</output><button class="st" data-act="step" data-d="1" data-i="${i}" data-p="${esc(p.id)}" aria-label="One sip more for ${esc(p.name)}">+</button></li>`}).join('')}</ul>
+<div class="act"><a class="btn ghost" href="${mapsUrl(b)}" target="_blank" rel="noopener">Directions</a>
+<button class="btn ghost" data-act="here" data-i="${i}" ${isHere||done?'disabled':''}>${isHere?'Checked in':"We're here"}</button>
+<button class="btn ghost" data-act="photo" data-i="${i}">Add photo</button>
+<button class="btn${done?' ghost':''}" data-act="done" data-i="${i}">${done?'Undo hole':'Hole done'}</button></div></section>`}).join('')}`}
+function vBoard(){
+  const mt=myTeam(),rows=S.teams.map(t=>({t,...stats(t)})).sort((a,b)=>(!a.n)-(!b.n)||a.avg-b.avg||b.holes-a.holes);
+  return `<h2>Leaderboard</h2><div class="card"><ol class="lb">${rows.map((r,i)=>`<li class="${mt&&r.t.id===mt.id?'mine':''}"><span class="rk">${i+1}</span>
+<div><div class="tn"><span class="dot" style="background:${col(r.t)}"></span>${esc(r.t.name)}</div><span class="mem">${esc(members(r.t.id).map(p=>p.name).join(', ')||'No players')}</span><span class="where">${esc(status(r.t))}</span></div>
+<span class="vp">${r.n?fmt(r.avg):''}<small>${r.n?`${r.holes} hole${r.holes===1?'':'s'}, ${r.sips} sips`:'no score'}</small></span></li>`).join('')||'<li class="empty" style="display:block">No teams yet.</li>'}</ol>
+<p class="note">Each score is the number of sips to finish the drink. Teams are ranked by their score against par per player, so team size does not matter. Lowest wins.</p></div>`}
+function vFeed(){
+  const tm_=Object.fromEntries(S.teams.map(t=>[t.id,t])),pm=Object.fromEntries(S.players.map(p=>[p.id,p]));
+  return `<h2>Live feed</h2><div class="card"><button class="btn" style="width:100%" data-act="photo" data-i="${Math.min(curOf(myTeam()),8)}">Post a photo</button></div>
+<div class="card"><ul class="feed">${S.posts.filter(o=>o.hole>=0&&o.hole<9).slice(0,120).map(o=>{const t=tm_[o.team_id],p=pm[o.player_id],b=bar(o.hole).name,tn=t?t.name:'A team';
+ const txt=o.kind==='done'?`<b>${esc(tn)}</b> finished hole ${o.hole+1} at ${esc(b)}${o.sips>0?`, ${o.sips} sips in total`:''}`:o.kind==='photo'?`<b>${esc(p?p.name:'Someone')}</b> (${esc(tn)}) at ${esc(b)}`:`<b>${esc(tn)}</b> checked in at ${esc(b)}`;
+ return `<li>${p?av(p,1):`<span class="av s" style="background:${col(t)}">${esc(ini(tn))}</span>`}<div style="flex:1"><p>${txt} <time>${tm(o.created_at)}</time></p>${o.kind==='photo'&&/^https:\/\//.test(o.photo||'')?`<img class="ph" loading="lazy" src="${esc(o.photo)}" alt="Photo from ${esc(b)}">`:''}</div></li>`}).join('')||'<li class="empty">Check ins, finished holes and photos show up here.</li>'}</ul></div>`}
+function vTop(){const t=myTeam(),m=me();return `<div class="in"><h1>${esc(S.game?S.game.name:'Bar Golf')}<small>${t?`<span class="dot" style="background:${col(t)};width:9px;height:9px"></span> ${esc(t.name)}, `:''}${esc(m?m.name:'')}</small></h1>
+<button class="ib" data-act="invite">Invite</button><button class="ib" data-act="sheet" aria-label="Profile and team">${m?esc(ini(m.name)):'Me'}</button></div>`}
+function vSheet(){const m=me(),t=myTeam();if(!m||!t)return '';const ms=members(t.id),sharing=ls.get('bg-loc')==='1';
+  return `<div class="ov" data-act="closeov"><div class="sheet" role="dialog" aria-modal="true">
+<div class="row">${av(m)}<b style="flex:1">${esc(m.name)}</b><button class="btn ghost" data-act="avatar">Profile photo</button></div>
+<form id="fName"><input id="meName" maxlength="20" value="${esc(m.name)}" aria-label="Your name" required><button class="btn">Save name</button></form>
+<h2>Your team</h2>
+<form id="fTName"><input id="teamName" maxlength="24" value="${esc(t.name)}" aria-label="Team name" required><button class="btn">Rename</button></form>
+<div class="chips">${ms.map(p=>`<span class="chip x">${esc(p.name)}${p.id===m.id?' (you)':`<button data-act="rm" data-p="${esc(p.id)}" aria-label="Remove ${esc(p.name)}">×</button>`}</span>`).join('')}</div>
+<form id="fMate"><input id="mate" maxlength="20" placeholder="Add a teammate" required><button class="btn ghost">Add</button></form>
+<h2>Location</h2>
+<label class="sw"><span>Share my live location on the map while the app is open</span><input type="checkbox" id="locSw" ${sharing?'checked':''}></label>
+<h2>Game</h2><p class="note" style="margin-bottom:10px">Code <b>${esc(code)}</b>. Anyone with the link can join.</p>
+<div class="act"><button class="btn ghost" data-act="switch">Switch player</button><button class="btn ghost" data-act="leave">Leave game</button></div>
+<div class="act" style="grid-template-columns:1fr"><button class="btn ghost" data-act="closeov">Close</button></div></div></div>`}
+function ask(text,fn){$('#ovl').innerHTML=`<div class="ov dlg"><div class="card" role="dialog" aria-modal="true"><p>${esc(text)}</p><div class="act"><button class="btn ghost" data-act="dno">Cancel</button><button class="btn red" data-act="dyes">Yes</button></div></div></div>`;askFn=fn;sheet=null}
+let askFn=null;
+
+/* ---------- render ---------- */
+function render(){
+  const a=document.activeElement;
+  if(a&&a.tagName==='INPUT'&&(a.closest('#view')||a.closest('#ovl'))){needRender=true;return}
+  needRender=false;
+  const v=$('#view');let screen;
+  if(!configured)screen='setup';else if(!code)screen='start';else if(!me()||!myTeam())screen='who';else screen='main';
+  const main=screen==='main';
+  $('#topbar').hidden=!main;$('#nav').hidden=!main;v.className=main?'':'full';
+  if(main){$('#topbar').className='top';$('#topbar').innerHTML=vTop();
+    document.querySelectorAll('nav button').forEach(b=>b.setAttribute('aria-current',b.dataset.tab===tab));}
+  const showMap=main&&tab==='map';$('#mapWrap').hidden=!showMap;v.hidden=showMap;
+  if(screen==='setup')v.innerHTML=vSetup();else if(screen==='start')v.innerHTML=vStart();else if(screen==='who')v.innerHTML=vWho();
+  else if(tab==='holes')v.innerHTML=vHoles();else if(tab==='board')v.innerHTML=vBoard();else if(tab==='feed')v.innerHTML=vFeed();
+  if(showMap)drawMap();
+  if(sheet==='me')$('#ovl').innerHTML=main?vSheet():'';
+}
+document.addEventListener('focusout',()=>setTimeout(()=>{const a=document.activeElement;if(needRender&&!(a&&a.tagName==='INPUT'))render()},0));
+
+/* ---------- map ---------- */
+let map=null,layer=null;
+function drawMap(){
+  if(!window.L){$('#mapbar').innerHTML='<span>The map needs an internet connection.</span>';return}
+  if(!map){map=L.map('map',{zoomControl:false,attributionControl:true});
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap &copy; CARTO'}).addTo(map);
+    map.fitBounds(H.map(h=>[h.b.lat,h.b.lng]),{padding:[30,30]});layer=L.layerGroup().addTo(map)}
+  setTimeout(()=>map.invalidateSize(),50);
+  layer.clearLayers();
+  const pts=H.map((h,i)=>bar(i));
+  L.polyline(pts.map(b=>[b.lat,b.lng]),{color:'#0f4a33',weight:3,dashArray:'2 8',opacity:.8}).addTo(layer);
+  pts.forEach((b,i)=>L.marker([b.lat,b.lng],{icon:L.divIcon({className:'',html:`<div class="pin">${i+1}</div>`,iconSize:[30,30],iconAnchor:[15,15]})}).bindPopup(`<b>${i+1}. ${esc(b.name)}</b><br>${esc(H[i].drink)}, par ${H[i].par}`).addTo(layer));
+  const byHole={};S.teams.forEach(t=>{const l=locOf(t)!=null?locOf(t):curOf(t)<9&&Object.keys(doneOf(t)).length?curOf(t):null;if(l!=null)(byHole[l]=byHole[l]||[]).push(t)});
+  Object.entries(byHole).forEach(([i,ts])=>{const b=pts[i];ts.forEach((t,k)=>L.marker([b.lat,b.lng],{icon:L.divIcon({className:'',html:`<span class="tpin" style="background:${col(t)}">${esc(t.name)}${locOf(t)==null?' →':''}</span>`,iconSize:null,iconAnchor:[-18,10-k*22]}),zIndexOffset:500}).addTo(layer))});
+  const fresh=Date.now()-20*60e3;let live=0;
+  S.players.forEach(p=>{const l=p.loc;if(!l||!(+l.t>fresh)||!isFinite(+l.lat))return;live++;const t=S.teams.find(x=>x.id===p.team_id);
+    L.circleMarker([+l.lat,+l.lng],{radius:8,color:'#fff',weight:2,fillColor:col(t),fillOpacity:1}).bindTooltip(`${esc(p.name)}, ${tm(+l.t)}`,{permanent:true,direction:'top',offset:[0,-8]}).addTo(layer)});
+  const sharing=ls.get('bg-loc')==='1';
+  $('#mapbar').innerHTML=`<span>${live?`${live} live location${live>1?'s':''}. `:''}Team labels show where each team is checked in, an arrow means on the way.</span><button class="btn ${sharing?'ghost':''}" data-act="loc">${sharing?'Stop sharing':'Share my location'}</button>`;
+}
+let watch=null,lastLoc=null;
+function setSharing(on){ls.set('bg-loc',on?'1':null);
+  if(watch!=null){navigator.geolocation.clearWatch(watch);watch=null}
+  const m=me();
+  if(!on){if(m)run(sb.from('players').update({loc:null}).eq('id',m.id));render();return}
+  if(!navigator.geolocation){toast('This phone does not offer location.');ls.set('bg-loc',null);return}
+  watch=navigator.geolocation.watchPosition(pos=>{const m=me();if(!m)return;const {latitude:lat,longitude:lng}=pos.coords,now=Date.now();
+    if(lastLoc&&now-lastLoc.t<40000&&Math.hypot((lat-lastLoc.lat)*111e3,(lng-lastLoc.lng)*92e3)<30)return;
+    lastLoc={lat,lng,t:now};m.loc=lastLoc;run(sb.from('players').update({loc:lastLoc}).eq('id',m.id));if(tab==='map')render()},
+    ()=>{toast('Location is blocked. Allow it for this app in your phone settings.');ls.set('bg-loc',null);render()},{enableHighAccuracy:true,maximumAge:20000});
+  render();
+}
+
+/* ---------- actions ---------- */
+let photoHole=0,avatarMode=false;
+function openGame(c){code=String(c).toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,8);if(!code)return;ls.set('bg-last',code);
+  history.replaceState(null,'','?g='+code);S.loaded=false;S.game=null;render();load();subscribe();if(ls.get('bg-loc')==='1')setSharing(true)}
+document.addEventListener('click',async e=>{
+  const nb=e.target.closest('nav button');if(nb){tab=nb.dataset.tab;ls.set('bg-tab',tab);render();scrollTo(0,0);return}
+  const el=e.target.closest('[data-act]');if(!el)return;const a=el.dataset.act,i=+el.dataset.i;
+  if(a==='closeov'){if(e.target!==el)return;sheet=null;$('#ovl').innerHTML='';needRender&&render();return}
+  if(a==='dno'){$('#ovl').innerHTML='';askFn=null;return}
+  if(a==='dyes'){const f=askFn;$('#ovl').innerHTML='';askFn=null;f&&f();return}
+  if(a==='open')return openGame(el.dataset.code);
+  if(a==='claim'){ls.set('bg-me-'+code,el.dataset.p);render();return}
+  if(a==='leave'){ask('Leave this game on this phone? Your scores stay saved.',()=>{if(watch!=null)navigator.geolocation.clearWatch(watch);watch=null;if(chan)sb.removeChannel(chan);chan=null;code=null;sheet=null;history.replaceState(null,'',location.pathname);ls.set('bg-last',null);render()});return}
+  if(a==='switch'){ls.set('bg-me-'+code,null);sheet=null;$('#ovl').innerHTML='';render();return}
+  if(a==='sheet'){sheet='me';render();return}
+  if(a==='invite'){const u=shareUrl();try{if(navigator.share){await navigator.share({title:S.game?S.game.name:'Bar Golf',text:'Join our Bar Golf game',url:u});return}}catch(err){return}
+    try{await navigator.clipboard.writeText(u);toast('Link copied. Send it to the group.')}catch(err){toast(u)}return}
+  const t=myTeam();
+  if(a==='step'){const p=S.players.find(x=>x.id===el.dataset.p);if(!p)return;const s={...scoresOf(p)},v=s[i],d=+el.dataset.d;
+    if(v==null){if(d<0)return;s[i]=1}else if(v+d<1)delete s[i];else s[i]=v+d;savePlayerScores(p,s);return}
+  if(a==='here'&&t){await patchTeam(t,{here:{h:i,t:Date.now()}});post({team_id:t.id,player_id:meId(),kind:'here',hole:i});return}
+  if(a==='done'&&t){const d={...doneOf(t)};if(d[i]){delete d[i];patchTeam(t,{done:d});return}
+    d[i]=Date.now();const sips=members(t.id).reduce((s,p)=>s+(+scoresOf(p)[i]||0),0);
+    await patchTeam(t,{done:d,here:null});post({team_id:t.id,player_id:meId(),kind:'done',hole:i,sips});
+    const n=curOf(t);if(n<9&&tab==='holes')setTimeout(()=>{const x=document.getElementById('h'+(n+1));if(x)x.scrollIntoView({behavior:reduce?'auto':'smooth',block:'start'})},80);return}
+  if(a==='h5'){const v=el.dataset.v;if(S.game.h5!==v){S.game.h5=v;render();run(sb.from('games').update({h5:v}).eq('id',code))}return}
+  if(a==='photo'){photoHole=i;avatarMode=false;$('#file').click();return}
+  if(a==='avatar'){avatarMode=true;$('#file').click();return}
+  if(a==='rm'){const p=S.players.find(x=>x.id===el.dataset.p);if(p)ask(`Remove ${p.name} from the team?`,()=>{S.players=S.players.filter(x=>x.id!==p.id);render();run(sb.from('players').delete().eq('id',p.id))});return}
+  if(a==='loc'){setSharing(ls.get('bg-loc')!=='1');return}
+});
+document.addEventListener('change',e=>{if(e.target.id==='locSw')setSharing(e.target.checked)});
+$('#file').addEventListener('change',async e=>{const f=e.target.files[0];e.target.value='';const m=me(),t=myTeam();if(!f||!m)return;
+  toast('Uploading photo…');
+  try{if(avatarMode){const url=await upload(f,320);m.avatar=url;render();await run(sb.from('players').update({avatar:url}).eq('id',m.id));toast('Profile photo saved.')}
+    else{const url=await upload(f,1400);await post({team_id:t&&t.id,player_id:m.id,kind:'photo',hole:photoHole,photo:url});toast('Photo posted.')}}
+  catch(err){console.error(err);toast('The photo could not be uploaded. Try again.')}});
+document.addEventListener('submit',async e=>{
+  e.preventDefault();const f=e.target,val=s=>(f.querySelector(s)||{}).value?.trim()||'';
+  if(f.id==='fNew'){const name=val('#gName');if(!name)return;const c=Array.from({length:5},()=>'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[Math.random()*31|0]).join('');
+    try{await q(sb.from('games').insert({id:c,name,h5:'yt'}));openGame(c);toast('Game created. Tap Invite to share it.')}catch(err){console.error(err);toast('Could not create the game. Check the setup.')}return}
+  if(f.id==='fJoin'){openGame(val('#gCode'));return}
+  if(f.id==='fTeam'){const tn=val('#tName'),pn=val('#tMe');if(!tn||!pn)return;const tid=uid(),pid=uid();
+    const used=S.teams.map(t=>+t.color);let c=0;while(used.includes(c)&&c<COLORS.length-1)c++;
+    try{await q(sb.from('teams').insert({id:tid,game_id:code,name:tn,color:c,done:{}}));await q(sb.from('players').insert({id:pid,game_id:code,team_id:tid,name:pn,scores:{}}));
+      ls.set('bg-me-'+code,pid);f.reset();await load()}catch(err){console.error(err);toast('Could not create the team.')}return}
+  if(f.dataset.form==='addme'){const pn=f.querySelector('input').value.trim();if(!pn)return;const pid=uid();
+    try{await q(sb.from('players').insert({id:pid,game_id:code,team_id:f.dataset.t,name:pn,scores:{}}));ls.set('bg-me-'+code,pid);f.reset();await load()}catch(err){toast('Could not join the team.')}return}
+  const m=me(),t=myTeam();if(!m||!t)return;
+  if(f.id==='fName'){const n=val('#meName');if(n&&n!==m.name){m.name=n;f.querySelector('input').blur();render();run(sb.from('players').update({name:n}).eq('id',m.id));toast('Name saved.')}return}
+  if(f.id==='fTName'){const n=val('#teamName');if(n&&n!==t.name){f.querySelector('input').blur();patchTeam(t,{name:n});toast('Team renamed.')}return}
+  if(f.id==='fMate'){const n=val('#mate');if(!n)return;const row={id:uid(),game_id:code,team_id:t.id,name:n,scores:{}};
+    S.players.push({...row,created_at:new Date().toISOString()});f.querySelector('input').value='';f.querySelector('input').blur();render();run(sb.from('players').insert(row))}
+});
+
+/* ---------- start ---------- */
+if(configured&&window.supabase){sb=window.supabase.createClient(CFG.url,CFG.key);
+  const c=new URLSearchParams(location.search).get('g')||ls.get('bg-last');if(c)openGame(c);else render()}
+else render();
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&code)load()});
+if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
+</script>
+</body></html>
