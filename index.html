@@ -449,12 +449,13 @@ let map=null,layer=null;
 function drawMap(){
   if(!window.L){$('#map').innerHTML='<p class="empty" style="padding:16px">The map needs an internet connection.</p>';return}
   if(!map){map=L.map('map',{zoomControl:false});
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap &copy; CARTO'}).addTo(map);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap'}).addTo(map);
     map.fitBounds(H.map(h=>[h.b.lat,h.b.lng]),{padding:[24,24]});layer=L.layerGroup().addTo(map)}
   setTimeout(()=>map.invalidateSize(),60);
   layer.clearLayers();
   const pts=H.map((h,i)=>bar(i));
-  pts.forEach((b,i)=>L.marker([b.lat,b.lng],{icon:L.divIcon({className:'',html:`<div class="pin">${i+1}</div>`,iconSize:[30,30],iconAnchor:[15,15]})}).bindPopup(`<b>${i+1}. ${esc(b.name)}</b><br>${esc(H[i].drink)}, par ${H[i].par}`).addTo(layer));
+  const OFF={2:[-24,6],5:[22,0],6:[-20,-16]};
+  pts.forEach((b,i)=>{const o=OFF[i]||[0,0];return L.marker([b.lat,b.lng],{icon:L.divIcon({className:'',html:`<div class="pin">${i+1}</div>`,iconSize:[30,30],iconAnchor:[15-o[0],15-o[1]]})}).bindPopup(`<b>${i+1}. ${esc(b.name)}</b><br>${esc(H[i].drink)}, par ${H[i].par}`).addTo(layer)});
   const byHole={};S.teams.forEach(t=>{const l=locOf(t);if(l!=null)(byHole[l]=byHole[l]||[]).push([t,0]);else{const {last}=lastDone(t);if(last>=0)(byHole[last]=byHole[last]||[]).push([t,1])}});
   Object.entries(byHole).forEach(([i,ts])=>{const b=pts[i];ts.forEach(([t,left],k)=>L.marker([b.lat,b.lng],{icon:L.divIcon({className:'',html:`<span class="tpin${left?' left':''}" style="background:${col(t)}">${esc(t.name)}${left?' (left)':''}</span>`,iconSize:null,iconAnchor:[-18,10-k*22]}),zIndexOffset:500}).addTo(layer))});
   const fresh=Date.now()-20*60e3;let live=0;
