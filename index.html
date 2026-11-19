@@ -5,8 +5,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Bar Golf">
-<title>Bar Golf</title>
+<meta name="apple-mobile-web-app-title" content="Pub Golf">
+<title>Cape Town Pub Golf</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" href="icon-192.png">
@@ -87,6 +87,24 @@ h3{margin:0;font-size:19px;line-height:1.2}
 output{width:40px;text-align:center;font-size:22px;font-weight:800;font-variant-numeric:tabular-nums}
 output.nil{color:var(--mute);font-weight:400}output.under{color:var(--ok)}output.over{color:var(--red)}
 .act{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.act .wide{grid-column:1/-1}
+.special{margin:8px 0 0;font-size:14px;font-weight:600;color:var(--gold)}
+.pn small.pen{display:block;font-size:12px;font-weight:600;color:var(--red);white-space:normal}
+.sc-t{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+.sc-t th,.sc-t td{padding:7px 4px;border-bottom:1px solid var(--line);text-align:center}
+.sc-t th{font-size:12px;color:var(--mute);font-weight:600;overflow:hidden;text-overflow:ellipsis;max-width:56px;white-space:nowrap}
+.sc-t td:first-child,.sc-t th:first-child{text-align:left}
+.sc-t tfoot td{font-weight:800;border-bottom:0}
+.sc-t .u{color:var(--ok);font-weight:700}.sc-t .o{color:var(--red);font-weight:700}
+.scroll{overflow-x:auto}
+.rules h3{margin:18px 0 6px}.rules h3:first-child{margin-top:0}
+.rules ul{list-style:disc;padding-left:20px}.rules li{margin:4px 0}
+.pt{width:100%;border-collapse:collapse;font-size:15px}.pt td{padding:8px 0;border-bottom:1px solid var(--line)}.pt td:last-child{text-align:right;font-weight:800;white-space:nowrap}
+.penlist{display:grid;gap:8px;margin-top:10px}
+.penlist button{display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:48px;padding:0 14px;border-radius:12px;border:1px solid var(--line);background:var(--card);font-weight:600;text-align:left;cursor:pointer}
+.penlist button b{color:var(--red);white-space:nowrap}
+.chip[aria-pressed=true]{background:var(--green);color:#fff}
+.tagline{font-style:italic;color:#bcd6c6;margin-top:4px!important}
 /* board */
 .lb li{display:grid;grid-template-columns:24px minmax(0,1fr) auto;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
 .lb li:last-child{border-bottom:0}
@@ -101,17 +119,41 @@ output.nil{color:var(--mute);font-weight:400}output.under{color:var(--ok)}output
 .feed li:last-child{border-bottom:0}
 .feed p{margin:0;font-size:15px}.feed time{font-size:13px;color:var(--mute);white-space:nowrap}
 .feed img.ph{display:block;width:100%;max-height:440px;object-fit:cover;border-radius:12px;margin-top:8px;background:var(--soft)}
-/* map */
-#mapWrap{position:fixed;left:0;right:0;top:calc(var(--st) + 64px);bottom:calc(64px + var(--sb));z-index:5}
-#map{position:absolute;inset:0;background:var(--soft)}
-.mapbar{position:absolute;left:10px;right:10px;bottom:10px;z-index:500;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;font-size:14px;display:flex;gap:10px;align-items:center;box-shadow:0 6px 20px -10px rgba(0,0,0,.4)}
-.mapbar span{flex:1}
+/* pubs picker */
+.pubgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:12px}
+.pubgrid button{position:relative;min-height:62px;border-radius:12px;border:1.5px solid rgba(255,255,255,.35);background:rgba(255,255,255,.06);color:#f3f8f4;font-size:12.5px;font-weight:600;line-height:1.15;padding:6px 4px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;text-align:center}
+.pubgrid button b{font-size:16px;font-weight:800}
+.pubgrid button.d{background:#f3f8f4;color:var(--green);border-color:#f3f8f4}
+.pubgrid button.h{background:var(--red);border-color:#fff}
+.pubgrid button.sel{outline:3px solid #f2c14e;outline-offset:1px}
+.pubgrid .cnt{position:absolute;top:-6px;right:-6px;min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:#f2c14e;color:#2a2000;font-size:11px;font-weight:800;display:grid;place-items:center}
+.legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px;font-size:12px;color:#bcd6c6}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+/* photos */
+.pgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.pgrid button{position:relative;padding:0;border:0;border-radius:14px;overflow:hidden;aspect-ratio:1;background:var(--soft);cursor:pointer}
+.pgrid img{width:100%;height:100%;object-fit:cover;display:block}
+.pgrid span{position:absolute;left:0;right:0;bottom:0;padding:18px 8px 6px;font-size:12px;font-weight:600;color:#fff;text-align:left;background:linear-gradient(transparent,rgba(0,0,0,.7))}
+select{font:inherit;font-size:16px;min-height:46px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:0 10px;flex:1 1 160px}
+.viewer{align-items:center;padding:12px;background:rgba(0,0,0,.92)}
+.viewer figure{margin:0;max-width:720px;width:100%}
+.viewer img{display:block;width:100%;max-height:72vh;object-fit:contain;border-radius:12px}
+.viewer figcaption{color:#fff;margin:10px 2px;font-size:15px}
+/* live */
+#mapWrap{max-width:720px;margin:0 auto;padding:14px 12px 0}
+#map{height:44vh;min-height:260px;border-radius:16px;overflow:hidden;background:var(--soft);border:1px solid var(--line)}
+.mapbar{margin-top:8px;font-size:14px;display:flex;gap:10px;align-items:center}
+.mapbar span{flex:1;color:var(--mute)}
+#mapWrap+main{padding-top:4px}
 .pin{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:#0f4a33;color:#fff;font:800 13px Archivo,sans-serif;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.35)}
 .tpin{display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;color:#fff;font:700 12px Archivo,sans-serif;border:2px solid #fff;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.35)}
+.tpin.left{opacity:.7;border-style:dashed}
+.wl li{display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}.wl li:last-child{border-bottom:0}
+.wl b{display:block}.wl span{font-size:13px;color:var(--mute)}
 /* nav */
 nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--card);border-top:1px solid var(--line);padding-bottom:var(--sb)}
-nav .in{max-width:720px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
-nav button{min-height:64px;border:0;background:transparent;color:var(--mute);font-weight:600;font-size:13px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+nav .in{max-width:720px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr)}
+nav button{min-height:62px;border:0;background:transparent;color:var(--mute);font-weight:600;font-size:12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
 nav button svg{width:24px;height:24px}
 nav button[aria-current=true]{color:var(--red)}
 /* sheet, dialog, toast */
@@ -119,21 +161,25 @@ nav button[aria-current=true]{color:var(--red)}
 .sheet{background:var(--bg);width:100%;max-width:720px;max-height:88vh;overflow:auto;border-radius:20px 20px 0 0;padding:18px 14px calc(18px + var(--sb))}
 .dlg{align-items:center;padding:20px}.dlg .card{max-width:360px;width:100%}.dlg p{margin:0 0 14px;font-weight:600}
 #toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(80px + var(--sb));z-index:80;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:14px;max-width:90vw;text-align:center}
+#net{position:fixed;left:0;right:0;top:0;z-index:90;background:var(--red);color:#fff;text-align:center;font-size:13px;font-weight:600;padding:calc(var(--st) + 4px) 10px 4px}
 .row{display:flex;gap:10px;align-items:center}
 .sw{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:46px}
 .sw input{width:24px;height:24px;accent-color:var(--green)}
 .empty{color:var(--mute);margin:0;padding:6px 0}
-@media(max-width:380px){.act{grid-template-columns:1fr}.st{width:40px}}
+.glist button{width:100%;justify-content:space-between;margin-top:8px}
+@media(max-width:380px){.st{width:40px}.pubgrid button{font-size:11.5px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style></head><body>
+<div id="net" hidden>No connection. Changes are saved as soon as you are back online.</div>
 <div id="topbar" hidden></div>
-<main id="view"></main>
 <div id="mapWrap" hidden><div id="map"></div><div class="mapbar" id="mapbar"></div></div>
+<main id="view"></main>
 <nav id="nav" hidden><div class="in">
-  <button data-tab="holes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 21V3l11 4-11 4"/></svg>Holes</button>
+  <button data-tab="pubs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 21V3l11 4-11 4"/></svg>Pubs</button>
   <button data-tab="board"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M12 20V4M20 20v-7"/></svg>Board</button>
-  <button data-tab="map"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Map</button>
-  <button data-tab="feed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="15" rx="3"/><circle cx="12" cy="12.5" r="3.5"/><path d="M8 5l1.5-2h5L16 5"/></svg>Feed</button>
+  <button data-tab="photos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="15" rx="3"/><circle cx="12" cy="12.5" r="3.5"/><path d="M8 5l1.5-2h5L16 5"/></svg>Photos</button>
+  <button data-tab="live"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Live</button>
+  <button data-tab="rules"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 4h11l3 3v13H5z"/><path d="M8 10h8M8 14h8M8 18h5"/></svg>Rules</button>
 </div></nav>
 <div id="ovl"></div>
 <div id="toast" hidden></div>
@@ -144,69 +190,85 @@ nav button[aria-current=true]{color:var(--red)}
 <script>
 {
 const H=[
- {par:3,drink:'Guinness or Hard Ice Tea',b:{name:'Lucky Lou',addr:'158 Kloof St, Gardens',lat:-33.9366703,lng:18.4047433,closed:[]}},
- {par:3,drink:'Aperol Sour',b:{name:'The Dark Horse',addr:'145 Kloof St, Gardens',lat:-33.9343684,lng:18.4073765,closed:[0,1]}},
- {par:3,drink:'Hard Lemonade',b:{name:'Aruba',addr:'108 Kloof St, Gardens',lat:-33.9341033,lng:18.4071816,closed:[1]}},
- {par:2,drink:'House wine',b:{name:'Van Hunks',addr:'1 Upper Union St, Gardens',lat:-33.9319701,lng:18.4085938,closed:[]}},
- {par:3,drink:'Brandy Coke',note:'Yours Truly and Blondie are right next to each other. Pick one for the whole game.',
+ {par:3,drink:'Guinness or Hard Ice Tea',short:'Lucky Lou',b:{name:'Lucky Lou',addr:'158 Kloof St, Gardens',lat:-33.9366703,lng:18.4047433,closed:[]}},
+ {par:3,drink:'Aperol Sour',short:'Dark Horse',b:{name:'The Dark Horse',addr:'145 Kloof St, Gardens',lat:-33.9343684,lng:18.4073765,closed:[0,1]}},
+ {par:3,drink:'Hard Lemonade',short:'Aruba',b:{name:'Aruba',addr:'108 Kloof St, Gardens',lat:-33.9341033,lng:18.4071816,closed:[1]}},
+ {par:2,drink:'Brandy Coke',short:'Van Hunks',special:'Water hazard: no toilets allowed at this hole.',b:{name:'Van Hunks',addr:'1 Upper Union St, Gardens',lat:-33.9319701,lng:18.4085938,closed:[]}},
+ {par:2,drink:'House wine',short:'Yours Truly / Blondie',note:'Yours Truly and Blondie are right next to each other. Pick one for the whole game.',
   b:{name:'Yours Truly',addr:'73 Kloof St, Gardens',lat:-33.9302078,lng:18.4109002,closed:[]},
   alt:{name:'Blondie',addr:'69 Kloof St, Gardens',lat:-33.9301436,lng:18.411004,closed:[1]}},
- {par:1,drink:'Springbok shot',b:{name:"Tiger's Milk",addr:'55 Kloof St, Gardens',lat:-33.9292781,lng:18.4116503,closed:[]}},
- {par:2,drink:'Corona',b:{name:'The Fat Cactus',addr:'5 Park Rd, Gardens',lat:-33.9287646,lng:18.4107849,closed:[]}},
- {par:3,drink:'Skinny Bitch',b:{name:'The Power & The Glory',addr:'13d Kloof Nek Rd, Tamboerskloof',lat:-33.9299367,lng:18.4081287,closed:[]}},
- {par:2,drink:'Savanna',note:'About 15 to 20 minutes on foot from hole 8. An Uber makes sense here.',
+ {par:1,drink:'Springbok shot',short:"Tiger's Milk",b:{name:"Tiger's Milk",addr:'55 Kloof St, Gardens',lat:-33.9292781,lng:18.4116503,closed:[]}},
+ {par:2,drink:'Corona',short:'Fat Cactus',special:'Dogleg: drink with your weak hand only.',b:{name:'The Fat Cactus',addr:'5 Park Rd, Gardens',lat:-33.9287646,lng:18.4107849,closed:[]}},
+ {par:3,drink:'Skinny Bitch',short:'Power & Glory',b:{name:'The Power & The Glory',addr:'13d Kloof Nek Rd, Tamboerskloof',lat:-33.9299367,lng:18.4081287,closed:[]}},
+ {par:2,drink:'Savanna',short:'Athletic Social',note:'In the CBD, about 15 to 20 minutes on foot from Kloof Street. An Uber makes sense here.',
   b:{name:'The Athletic Club & Social',addr:'35 Buitengracht St, CBD',lat:-33.9194999,lng:18.4188692,closed:[0]}}
 ];
+const PENS=[['sit','Sitting out a hole',3],['puke','Puking',3],['fall','Falling over',1],['spillown','Spilling your own drink',2],['spillother',"Spilling someone else's drink",1],['dispute','Failed referee dispute',1],['cheat','Cheating',3],['special','Breaking special hole rules',2],['bribe','Bribery attempt',2],['chaos','Ungentlemanly behaviour or general chaos',1]];
+const PENMAP=Object.fromEntries(PENS.map(x=>[x[0],x]));
+const PAR=H.reduce((a,h)=>a+h.par,0);
 const COLORS=['#e2412f','#2f6fe2','#d99a00','#8e44ad','#139a74','#d35400','#c2185b','#34495e','#0097a7','#6d8b00'];
 const $=q=>document.querySelector(q);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid=()=>crypto.randomUUID?crypto.randomUUID():'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0;return(c==='x'?r:(r&3|8)).toString(16)});
 const tm=t=>{const d=new Date(t);return isNaN(d)?'':d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})};
-const fmt=v=>{v=Math.round(v*10)/10;return v===0?'E':v>0?'+'+v:'−'+Math.abs(v)};
+const fmt=v=>v===0?'E':v>0?'+'+v:'−'+Math.abs(v);
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const em=e=>(e&&(e.message||e.error_description||e.error||e.code))||'unknown error';
 const today=new Date().getDay();
-const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
 const ls={get:k=>{try{return localStorage.getItem(k)}catch(e){return null}},set:(k,v)=>{try{v==null?localStorage.removeItem(k):localStorage.setItem(k,v)}catch(e){}}};
 const CFG=window.BARGOLF_CONFIG||{};
 const configured=CFG.url&&CFG.key&&!/YOUR_/.test(CFG.url+CFG.key);
-let sb=null,chan=null,code=null,tab=ls.get('bg-tab')||'holes',needRender=false,sheet=null;
+const TABS=['pubs','board','photos','live','rules'];
+let sb=null,chan=null,code=null,tab=TABS.includes(ls.get('bg-tab'))?ls.get('bg-tab'):'pubs',needRender=false,sheet=null,selHole=null,recent=null;
 const S={game:null,teams:[],players:[],posts:[],loaded:false};
-const pend={},timers={};
 
 /* ---------- helpers ---------- */
 const meId=()=>code?ls.get('bg-me-'+code):null;
 const me=()=>S.players.find(p=>p.id===meId())||null;
 const myTeam=()=>{const m=me();return m?S.teams.find(t=>t.id===m.team_id)||null:null};
 const members=tid=>S.players.filter(p=>p.team_id===tid).sort((a,b)=>String(a.created_at).localeCompare(String(b.created_at)));
-const scoresOf=p=>pend[p.id]||p.scores||{};
 const doneOf=t=>(t&&t.done)||{};
-const curOf=t=>{if(!t)return 0;for(let i=0;i<9;i++)if(!doneOf(t)[i])return i;return 9};
-const locOf=t=>t&&t.here&&t.here.h>=0&&t.here.h<9&&!doneOf(t)[t.here.h]?+t.here.h:null;
+const nDone=t=>Object.keys(doneOf(t)).filter(k=>k>=0&&k<9).length;
+const locOf=t=>t&&t.here&&+t.here.h>=0&&+t.here.h<9&&!doneOf(t)[+t.here.h]?+t.here.h:null;
+const firstOpen=t=>{for(let i=0;i<9;i++)if(!doneOf(t)[i])return i;return 0};
+const sel=()=>{if(selHole!=null)return selHole;const t=myTeam(),l=locOf(t);return l!=null?l:firstOpen(t)};
 const bar=i=>i===4&&S.game&&S.game.h5==='bl'?H[4].alt:H[i].b;
 const col=t=>COLORS[(t&&+t.color||0)%COLORS.length];
 const ini=n=>String(n||'?').trim().split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase();
 const av=(p,sm)=>{if(!p)return '';const t=S.teams.find(x=>x.id===p.team_id);
   return p.avatar&&/^https:\/\//.test(p.avatar)?`<img class="av${sm?' s':''}" src="${esc(p.avatar)}" alt="">`:`<span class="av${sm?' s':''}" style="background:${col(t)}" aria-hidden="true">${esc(ini(p.name))}</span>`};
-const stats=t=>{const ms=members(t.id);let vp=0,sips=0,n=0;ms.forEach(p=>{const s=scoresOf(p);H.forEach((h,i)=>{const v=+s[i];if(v>0){vp+=v-h.par;sips+=v;n++}})});
-  return{vp,sips,n,avg:ms.length?vp/ms.length:0,holes:Object.keys(doneOf(t)).length,size:ms.length}};
+const isPen=o=>typeof o.kind==='string'&&o.kind.startsWith('pen:');
+const isPhoto=o=>o.kind==='photo'&&/^https:\/\//.test(o.photo||'');
+const pensOf=(pid,i)=>S.posts.filter(o=>isPen(o)&&o.player_id===pid&&(i==null||o.hole===i));
+const penSum=(pid,i)=>pensOf(pid,i).reduce((a,o)=>a+(+o.sips||0),0);
+const penName=o=>(PENMAP[o.kind.slice(4)]||[0,'Referee call'])[1];
+const stats=t=>{const ms=members(t.id);let vp=0,sips=0,n=0,pens=0;ms.forEach(p=>{const s=scoresOf(p);pens+=penSum(p.id);H.forEach((h,i)=>{const v=+s[i];if(v>0){vp+=v-h.par;sips+=v;n++}})});
+  return{vp,sips,n,pens,total:sips+pens,diff:vp+pens,holes:nDone(t),size:ms.length}};
+const lastDone=t=>{let last=-1,lt=0;const d=doneOf(t);for(let i=0;i<9;i++)if(d[i]&&+d[i]>lt){lt=+d[i];last=i}return{last,lt}};
 const status=t=>{const l=locOf(t);if(l!=null)return `At ${bar(l).name} since ${tm(t.here.t)}`;
-  let last=-1,lt=0;const d=doneOf(t);for(let i=0;i<9;i++)if(d[i]&&d[i]>lt){lt=d[i];last=i}
-  if(last<0)return 'Not started yet';const c=curOf(t);if(c>8)return `Finished all 9 at ${tm(lt)}`;
-  return `Left ${bar(last).name} at ${tm(lt)}, heading to ${bar(c).name}`};
+  const {last,lt}=lastDone(t);if(last<0)return 'Not started yet';if(nDone(t)>=9)return `Finished all 9 at ${tm(lt)}`;
+  return `Left ${bar(last).name} at ${tm(lt)}`};
 const mapsUrl=b=>`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(b.name+', '+b.addr+', Cape Town')}`;
-let toastT;const toast=t=>{const el=$('#toast');el.textContent=t;el.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>el.hidden=true,3200)};
+let toastT;const toast=t=>{const el=$('#toast');el.textContent=t;el.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>el.hidden=true,3500)};
 const shareUrl=()=>location.origin+location.pathname+'?g='+code;
 
 /* ---------- data ---------- */
 async function q(p){const r=await p;if(r&&r.error)throw r.error;return r?r.data:null}
+// retries a write up to 3 times; fn must build a fresh query each time
+async function save(fn,label){let last;for(let k=0;k<3;k++){try{await q(fn());return true}catch(e){last=e;await sleep(1200*(k+1))}}
+  console.error(last);toast(`${label||'Not saved'}: ${em(last)}`);sched();return false}
+let loading=false;
 async function load(){
-  if(!code)return;
+  if(!code||loading)return;loading=true;
   try{
     const [g,t,p,po]=await Promise.all([q(sb.from('games').select('*').eq('id',code)),q(sb.from('teams').select('*').eq('game_id',code)),q(sb.from('players').select('*').eq('game_id',code)),q(sb.from('posts').select('*').eq('game_id',code))]);
     S.game=(g||[])[0]||null;S.teams=(t||[]).sort((a,b)=>String(a.created_at).localeCompare(String(b.created_at)));S.players=p||[];
-    S.posts=(po||[]).sort((a,b)=>String(b.created_at).localeCompare(String(a.created_at))).slice(0,200);S.loaded=true;
-  }catch(e){toast('No connection to the game right now.')}
-  render();
+    S.posts=(po||[]).sort((a,b)=>String(b.created_at).localeCompare(String(a.created_at)));S.loaded=true;setNet(true);
+  }catch(e){console.error(e);if(!S.loaded)toast('No connection to the game: '+em(e));setNet(navigator.onLine)}
+  loading=false;render();
 }
+async function loadRecent(){try{const since=new Date(Date.now()-3*864e5).toISOString();const g=await q(sb.from('games').select('*').gte('created_at',since));
+  recent=(g||[]).sort((a,b)=>String(b.created_at).localeCompare(String(a.created_at))).slice(0,8)}catch(e){recent=[]}render()}
 let lt;const sched=()=>{clearTimeout(lt);lt=setTimeout(load,250)};
 function subscribe(){
   if(chan)sb.removeChannel(chan);
@@ -214,12 +276,33 @@ function subscribe(){
   ['games','teams','players','posts'].forEach(tb=>chan.on('postgres_changes',{event:'*',schema:'public',table:tb},sched));
   chan.subscribe();
 }
-async function run(p,msg){try{await q(p)}catch(e){console.error(e);toast(msg||'That did not save. Try again.');sched()}}
-function savePlayerScores(p,s){pend[p.id]=s;render();clearTimeout(timers[p.id]);
-  timers[p.id]=setTimeout(async()=>{const v=pend[p.id];await run(sb.from('players').update({scores:v}).eq('id',p.id));if(pend[p.id]===v){delete pend[p.id];const x=S.players.find(y=>y.id===p.id);if(x)x.scores=v}},400)}
-function patchTeam(t,obj){Object.assign(t,obj);render();return run(sb.from('teams').update(obj).eq('id',t.id))}
+function setNet(ok){$('#net').hidden=ok}
+
+/* scores: only the changed holes are merged into the latest server copy, so two phones never overwrite each other */
+const dirty={},flushing={},ftimer={};
+const scoresOf=p=>{const d=dirty[p.id];if(!d)return p.scores||{};const s={...(p.scores||{})};for(const k in d){if(d[k]==null)delete s[k];else s[k]=d[k]}return s};
+function setScore(p,i,v){(dirty[p.id]=dirty[p.id]||{})[i]=v;render();clearTimeout(ftimer[p.id]);ftimer[p.id]=setTimeout(()=>flushScores(p.id),450)}
+async function flushScores(pid){
+  if(flushing[pid]){clearTimeout(ftimer[pid]);ftimer[pid]=setTimeout(()=>flushScores(pid),400);return}
+  const d=dirty[pid];if(!d||!Object.keys(d).length)return;flushing[pid]=true;const sent={...d};
+  try{const f=await q(sb.from('players').select('scores').eq('id',pid));const base={...(((f||[])[0]||{}).scores||{})};
+    for(const k in sent){if(sent[k]==null)delete base[k];else base[k]=sent[k]}
+    await q(sb.from('players').update({scores:base}).eq('id',pid));
+    const x=S.players.find(y=>y.id===pid);if(x)x.scores=base;
+    for(const k in sent)if(dirty[pid]&&dirty[pid][k]===sent[k])delete dirty[pid][k];
+    if(dirty[pid]&&!Object.keys(dirty[pid]).length)delete dirty[pid];setNet(true);
+  }catch(e){console.error(e);setNet(false);ftimer[pid]=setTimeout(()=>flushScores(pid),5000)}
+  flushing[pid]=false;render();
+  if(dirty[pid]&&Object.keys(dirty[pid]).length&&!ftimer[pid])flushScores(pid);
+}
+const flushAll=()=>Object.keys(dirty).forEach(flushScores);
+async function setDone(t,i,on){
+  const leave=on&&locOf(t)===i,d={...doneOf(t)};if(on)d[i]=Date.now();else delete d[i];t.done=d;if(leave)t.here=null;render();
+  await save(async()=>{const f=await q(sb.from('teams').select('done').eq('id',t.id));const base={...(((f||[])[0]||{}).done||{})};if(on)base[i]=d[i];else delete base[i];
+    const upd={done:base};if(leave)upd.here=null;return sb.from('teams').update(upd).eq('id',t.id)},'Hole not saved');
+}
 function post(o){const row={id:uid(),game_id:code,created_at:new Date().toISOString(),...o};S.posts.unshift(row);render();
-  const {created_at,...ins}=row;return run(sb.from('posts').insert(ins))}
+  const {created_at,...ins}=row;return save(()=>sb.from('posts').insert(ins),'Not posted')}
 async function shrink(file,max){const url=URL.createObjectURL(file);
   try{const img=new Image();img.src=url;await img.decode();const k=Math.min(1,max/Math.max(img.naturalWidth,img.naturalHeight)),c=document.createElement('canvas');
     c.width=Math.round(img.naturalWidth*k);c.height=Math.round(img.naturalHeight*k);c.getContext('2d').drawImage(img,0,0,c.width,c.height);
@@ -230,10 +313,12 @@ async function upload(file,max){const blob=await shrink(file,max),path=`${code}/
 
 /* ---------- screens ---------- */
 function vSetup(){return `<div class="hero"><h1>Almost there</h1><p>The app is not connected to a database yet.</p></div>
-<div class="card"><p style="margin:0">Open <b>config.js</b> and paste your Supabase URL and anon key, then deploy again. The setup guide in the folder walks you through it.</p></div>`}
-function vStart(){const last=ls.get('bg-last');return `<div class="hero"><h1>Kloof Street Bar Golf</h1><p>9 holes, par 22. Teams, live scores, photos and a map of who is where.</p></div>
-${last?`<div class="card"><b>Continue your last game</b><div class="act" style="grid-template-columns:1fr"><button class="btn" data-act="open" data-code="${esc(last)}">Open game ${esc(last)}</button></div></div>`:''}
-<div class="card"><b>Start a new game</b><p class="note">You get a link to send to everyone.</p><form id="fNew"><input id="gName" maxlength="40" placeholder="Game name, e.g. CEMS Bar Golf" required><button class="btn">Create</button></form></div>
+<div class="card"><p style="margin:0">Open <b>config.js</b> and paste your Supabase URL and key, then upload it again.</p></div>`}
+function vStart(){const last=ls.get('bg-last');if(recent==null&&sb)loadRecent();
+  return `<div class="hero"><h1>Cape Town Pub Golf</h1><p>Tee off your Thirst</p><p class="tagline">"Where Skill Meets Chaos"</p></div>
+${recent&&recent.length?`<div class="card glist"><b>Games running now</b><p class="note">Tap yours to join.</p>${recent.map(g=>`<button class="btn ghost" data-act="open" data-code="${esc(g.id)}"><span>${esc(g.name)}</span><span class="note" style="margin:0">${esc(g.id)}</span></button>`).join('')}</div>`
+  :last?`<div class="card"><button class="btn" style="width:100%" data-act="open" data-code="${esc(last)}">Continue game ${esc(last)}</button></div>`:''}
+<div class="card"><b>Start a new game</b><p class="note">You get a link to send to everyone.</p><form id="fNew"><input id="gName" maxlength="40" placeholder="Game name" required><button class="btn">Create</button></form></div>
 <div class="card"><b>Join with a code</b><form id="fJoin"><input id="gCode" maxlength="8" placeholder="Code" autocapitalize="characters" autocomplete="off" required><button class="btn">Join</button></form></div>`}
 function vWho(){
   if(!S.loaded)return '<p class="empty">Loading the game…</p>';
@@ -244,39 +329,75 @@ ${S.teams.map(t=>{const ms=members(t.id);return `<div class="card"><div class="t
 <form data-form="addme" data-t="${esc(t.id)}"><input maxlength="20" placeholder="Your name" required aria-label="Your name"><button class="btn ghost">Join ${esc(t.name)}</button></form></div>`}).join('')}
 <div class="card"><b>Create a team</b><form id="fTeam"><input id="tName" maxlength="24" placeholder="Team name" required><input id="tMe" maxlength="20" placeholder="Your name" required><button class="btn">Create team</button></form></div>
 <p class="note" style="text-align:center">Game code <b>${esc(code)}</b></p>`}
-function vHoles(){
-  const t=myTeam(),c=curOf(t),ms=t?members(t.id):[],n=Object.keys(doneOf(t)).length;
-  const teamsAt=i=>S.teams.filter(x=>locOf(x)===i);
-  return `<div class="prog"><b>${c>8?'Round complete':`Hole ${c+1}: ${esc(bar(c).name)}`}</b><span>${esc(t?t.name:'')}, ${n} of 9 done</span>
+
+function vPubs(){
+  const t=myTeam(),i=sel(),h=H[i],b=bar(i),ms=t?members(t.id):[],n=nDone(t),loc=locOf(t),done=!!doneOf(t)[i],isHere=loc===i;
+  const others=k=>S.teams.filter(x=>x!==t&&locOf(x)===k).length;
+  const closed=b.closed.includes(today),here=S.teams.filter(x=>locOf(x)===i);
+  return `<div class="prog"><b>${loc!=null?`You're at ${esc(bar(loc).name)}`:n>=9?'Course complete!':'Where are you? Pick your pub'}</b><span>${esc(t?t.name:'')}, ${n} of 9 done, any order</span>
 <div class="bar"><i style="width:${n/9*100}%"></i></div>
-<div class="flags">${H.map((h,i)=>`<a href="#h${i+1}" class="${doneOf(t)[i]?'d':i===c?'c':''}" aria-label="Hole ${i+1}">${i+1}</a>`).join('')}</div></div>
-${H.map((h,i)=>{const b=bar(i),closed=b.closed.includes(today),here=teamsAt(i),done=!!doneOf(t)[i],isHere=locOf(t)===i;
-return `<section class="hole${done?' done':''}${i===c?' now':''}" id="h${i+1}">
+<div class="pubgrid">${H.map((x,k)=>{const o=others(k);return `<button data-act="pick" data-i="${k}" class="${doneOf(t)[k]?'d':loc===k?'h':''}${k===i?' sel':''}" aria-label="${esc(bar(k).name)}"><b>${k+1}</b>${esc(k===4&&S.game&&S.game.h5==='bl'?'Blondie':x.short)}${o?`<span class="cnt">${o}</span>`:''}</button>`}).join('')}</div>
+<div class="legend"><span><i style="background:var(--red)"></i>You're here</span><span><i style="background:#f3f8f4"></i>Done</span><span><i style="background:#f2c14e"></i>Other teams there</span></div></div>
+<section class="hole${done?' done':''}${isHere?' now':''}">
 <div class="hd"><span class="num">${i+1}</span><div class="tt"><h3>${esc(b.name)}</h3><p class="addr">${esc(b.addr)}</p></div><span class="par">Par<b>${h.par}</b></span></div>
 <p class="drink"><span>Drink</span>${esc(h.drink)}</p>
 ${i===4?`<div class="seg" role="group" aria-label="Bar for hole 5"><button data-act="h5" data-v="yt" aria-pressed="${S.game.h5!=='bl'}">Yours Truly</button><button data-act="h5" data-v="bl" aria-pressed="${S.game.h5==='bl'}">Blondie</button></div>`:''}
 ${closed?'<p class="warn">Usually closed today. Check before you go.</p>':''}
+${h.special?`<p class="special">⛳ ${h.special}</p>`:''}
 ${h.note?`<p class="note">${h.note}</p>`:''}
 ${here.length?`<div class="herenow">${here.map(x=>`<span class="dot" style="background:${col(x)}"></span>${esc(x.name)}`).join(', ')}<span>here now</span></div>`:''}
-<ul class="sc">${ms.map(p=>{const v=scoresOf(p)[i],cl=v==null?'nil':v<h.par?'under':v>h.par?'over':'even';
- return `<li>${av(p,1)}<span class="pn">${esc(p.name)}</span><button class="st" data-act="step" data-d="-1" data-i="${i}" data-p="${esc(p.id)}" aria-label="One sip less for ${esc(p.name)}">−</button><output class="${cl}">${v??'·'}</output><button class="st" data-act="step" data-d="1" data-i="${i}" data-p="${esc(p.id)}" aria-label="One sip more for ${esc(p.name)}">+</button></li>`}).join('')}</ul>
-<div class="act"><a class="btn ghost" href="${mapsUrl(b)}" target="_blank" rel="noopener">Directions</a>
-<button class="btn ghost" data-act="here" data-i="${i}" ${isHere||done?'disabled':''}>${isHere?'Checked in':"We're here"}</button>
-<button class="btn ghost" data-act="photo" data-i="${i}">Add photo</button>
-<button class="btn${done?' ghost':''}" data-act="done" data-i="${i}">${done?'Undo hole':'Hole done'}</button></div></section>`}).join('')}`}
+${!isHere&&!done?`<div class="act" style="grid-template-columns:1fr"><button class="btn" data-act="here" data-i="${i}">We're here: check in</button></div>`:''}
+<ul class="sc">${ms.map(p=>{const v=scoresOf(p)[i],cl=v==null?'nil':v<h.par?'under':v>h.par?'over':'even',pn=pensOf(p.id,i);
+ return `<li>${av(p,1)}<span class="pn">${esc(p.name)}${pn.length?`<small class="pen">${pn.map(o=>`${esc(penName(o))} +${+o.sips}`).join(', ')}</small>`:''}</span><button class="st" data-act="step" data-d="-1" data-i="${i}" data-p="${esc(p.id)}" aria-label="One sip less for ${esc(p.name)}">−</button><output class="${cl}">${v??'·'}</output><button class="st" data-act="step" data-d="1" data-i="${i}" data-p="${esc(p.id)}" aria-label="One sip more for ${esc(p.name)}">+</button></li>`}).join('')}</ul>
+<p class="note">Count the sips each player needs to finish the drink.</p>
+<div class="act"><button class="btn ghost" data-act="photo" data-i="${i}">Add photo</button><button class="btn ghost" data-act="pen" data-i="${i}">Penalty</button>
+<a class="btn ghost" href="${mapsUrl(b)}" target="_blank" rel="noopener">Directions</a><button class="btn ghost" data-act="sheet">Team</button>
+<button class="btn wide${done?' ghost':''}" data-act="done" data-i="${i}">${done?'Undo: not done yet':'Hole done'}</button></div></section>`}
+
+let scTeam=null;
 function vBoard(){
-  const mt=myTeam(),rows=S.teams.map(t=>({t,...stats(t)})).sort((a,b)=>(!a.n)-(!b.n)||a.avg-b.avg||b.holes-a.holes);
+  const mt=myTeam(),rows=S.teams.map(t=>({t,...stats(t)})).sort((a,b)=>(!a.n&&!a.pens)-(!b.n&&!b.pens)||a.diff-b.diff||a.total-b.total);
+  const st=S.teams.find(t=>t.id===scTeam)||mt||S.teams[0];
   return `<h2>Leaderboard</h2><div class="card"><ol class="lb">${rows.map((r,i)=>`<li class="${mt&&r.t.id===mt.id?'mine':''}"><span class="rk">${i+1}</span>
-<div><div class="tn"><span class="dot" style="background:${col(r.t)}"></span>${esc(r.t.name)}</div><span class="mem">${esc(members(r.t.id).map(p=>p.name).join(', ')||'No players')}</span><span class="where">${esc(status(r.t))}</span></div>
-<span class="vp">${r.n?fmt(r.avg):''}<small>${r.n?`${r.holes} hole${r.holes===1?'':'s'}, ${r.sips} sips`:'no score'}</small></span></li>`).join('')||'<li class="empty" style="display:block">No teams yet.</li>'}</ol>
-<p class="note">Each score is the number of sips to finish the drink. Teams are ranked by their score against par per player, so team size does not matter. Lowest wins.</p></div>`}
-function vFeed(){
+<div><div class="tn"><span class="dot" style="background:${col(r.t)}"></span>${esc(r.t.name)}</div><span class="mem">${esc(members(r.t.id).map(p=>p.name).join(', ')||'No players')}</span><span class="where">${esc(status(r.t))}, ${r.holes} of 9</span></div>
+<span class="vp">${r.n||r.pens?r.total:''}<small>${r.n||r.pens?`${fmt(r.diff)} vs par${r.pens?`, ${r.pens} pen`:''}`:'no score'}</small></span></li>`).join('')||'<li class="empty" style="display:block">No teams yet.</li>'}</ol>
+<p class="note">Big number: all strokes plus penalties. Ranked by score against par so far, so teams on different holes compare fairly. At the end the lowest total wins, a tie goes to a playoff hole.</p></div>
+${st?vCard(st):''}`}
+function vCard(t){
+  const ms=members(t.id);let tot=0,tp=0;
+  const rows=H.map((h,i)=>{const pen=ms.reduce((a,p)=>a+penSum(p.id,i),0);let sum=pen,any=pen>0;
+    const cells=ms.map(p=>{const v=+scoresOf(p)[i];if(v>0){sum+=v;any=true}return `<td class="${v>0?(v<h.par?'u':v>h.par?'o':''):''}">${v>0?v:''}</td>`}).join('');
+    tot+=sum;tp+=pen;return `<tr><td>${i+1}. ${esc(i===4&&S.game&&S.game.h5==='bl'?'Blondie':h.short.replace(' / Blondie',''))}</td><td>${h.par}</td>${cells}<td>${pen||''}</td><td><b>${any?sum:''}</b></td></tr>`}).join('');
+  return `<h2>Scorecard</h2><div class="chips" style="margin:0 0 10px">${S.teams.map(x=>`<button class="chip" data-act="sct" data-t="${esc(x.id)}" aria-pressed="${x.id===t.id}"><span class="dot" style="background:${col(x)}"></span>${esc(x.name)}</button>`).join('')}</div>
+<div class="card scroll"><table class="sc-t"><thead><tr><th>Hole</th><th>Par</th>${ms.map(p=>`<th>${esc(p.name)}</th>`).join('')}<th>Pen</th><th>Score</th></tr></thead><tbody>${rows}</tbody>
+<tfoot><tr><td>Total</td><td>${PAR}</td>${ms.map(p=>{const s=scoresOf(p);let a=0;for(let i=0;i<9;i++)a+=+s[i]||0;return `<td>${a||''}</td>`}).join('')}<td>${tp||''}</td><td>${tot||''}</td></tr></tfoot></table></div>`}
+
+let phHole=null;
+function vPhotos(){
   const tm_=Object.fromEntries(S.teams.map(t=>[t.id,t])),pm=Object.fromEntries(S.players.map(p=>[p.id,p]));
-  return `<h2>Live feed</h2><div class="card"><button class="btn" style="width:100%" data-act="photo" data-i="${Math.min(curOf(myTeam()),8)}">Post a photo</button></div>
-<div class="card"><ul class="feed">${S.posts.filter(o=>o.hole>=0&&o.hole<9).slice(0,120).map(o=>{const t=tm_[o.team_id],p=pm[o.player_id],b=bar(o.hole).name,tn=t?t.name:'A team';
- const txt=o.kind==='done'?`<b>${esc(tn)}</b> finished hole ${o.hole+1} at ${esc(b)}${o.sips>0?`, ${o.sips} sips in total`:''}`:o.kind==='photo'?`<b>${esc(p?p.name:'Someone')}</b> (${esc(tn)}) at ${esc(b)}`:`<b>${esc(tn)}</b> checked in at ${esc(b)}`;
- return `<li>${p?av(p,1):`<span class="av s" style="background:${col(t)}">${esc(ini(tn))}</span>`}<div style="flex:1"><p>${txt} <time>${tm(o.created_at)}</time></p>${o.kind==='photo'&&/^https:\/\//.test(o.photo||'')?`<img class="ph" loading="lazy" src="${esc(o.photo)}" alt="Photo from ${esc(b)}">`:''}</div></li>`}).join('')||'<li class="empty">Check ins, finished holes and photos show up here.</li>'}</ul></div>`}
-function vTop(){const t=myTeam(),m=me();return `<div class="in"><h1>${esc(S.game?S.game.name:'Bar Golf')}<small>${t?`<span class="dot" style="background:${col(t)};width:9px;height:9px"></span> ${esc(t.name)}, `:''}${esc(m?m.name:'')}</small></h1>
+  const ph=S.posts.filter(isPhoto),hsel=phHole!=null?phHole:sel();
+  return `<h2>Picture board</h2><div class="card"><form id="fPhoto" style="margin:0"><select id="phHole" aria-label="Pub for the photo">${H.map((h,i)=>`<option value="${i}" ${i===hsel?'selected':''}>${i+1}. ${esc(bar(i).name)}</option>`).join('')}</select><button class="btn">Post a photo</button></form></div>
+${ph.length?`<div class="pgrid">${ph.map(o=>{const p=pm[o.player_id],t=tm_[o.team_id];return `<button data-act="view" data-id="${esc(o.id)}"><img loading="lazy" src="${esc(o.photo)}" alt="Photo at ${esc(bar(o.hole).name)}"><span>${esc(p?p.name:'Someone')}${t?` (${esc(t.name)})`:''}<br>${esc(bar(o.hole).name)}, ${tm(o.created_at)}</span></button>`}).join('')}</div>`:'<div class="card"><p class="empty">No photos yet. Be the first.</p></div>'}`}
+function vViewer(id){const o=S.posts.find(x=>x.id===id);if(!o)return '';const p=S.players.find(x=>x.id===o.player_id),t=S.teams.find(x=>x.id===o.team_id);
+  return `<div class="ov viewer" data-act="closeov"><figure><img src="${esc(o.photo)}" alt=""><figcaption><b>${esc(p?p.name:'Someone')}</b>${t?` (${esc(t.name)})`:''} at ${esc(bar(o.hole).name)}, ${tm(o.created_at)}</figcaption>
+<div class="act"><button class="btn ghost" style="color:#fff;border-color:rgba(255,255,255,.4)" data-act="delphoto" data-id="${esc(o.id)}">Delete</button><button class="btn" data-act="closeov">Close</button></div></figure></div>`}
+
+function vLive(){
+  const tm_=Object.fromEntries(S.teams.map(t=>[t.id,t])),pm=Object.fromEntries(S.players.map(p=>[p.id,p]));
+  return `<h2>Where everyone is</h2><div class="card"><ul class="wl">${S.teams.map(t=>`<li><span class="dot" style="background:${col(t)};width:14px;height:14px"></span><div><b>${esc(t.name)}</b><span>${esc(status(t))}, ${nDone(t)} of 9 done</span></div></li>`).join('')||'<li class="empty">No teams yet.</li>'}</ul></div>
+<h2>Activity</h2><div class="card"><ul class="feed">${S.posts.filter(o=>o.hole>=0&&o.hole<9).slice(0,80).map(o=>{const t=tm_[o.team_id],p=pm[o.player_id],b=bar(o.hole).name,tn=t?t.name:'A team';
+ const txt=isPen(o)?`<b>${esc(p?p.name:'Someone')}</b> (${esc(tn)}) got +${+o.sips} at ${esc(b)}: ${esc(penName(o))}`:o.kind==='done'?`<b>${esc(tn)}</b> finished ${esc(b)}${o.sips>0?`, ${o.sips} sips in total`:''}`:o.kind==='photo'?`<b>${esc(p?p.name:'Someone')}</b> (${esc(tn)}) posted a photo at ${esc(b)}`:`<b>${esc(tn)}</b> checked in at ${esc(b)}`;
+ return `<li>${p?av(p,1):`<span class="av s" style="background:${col(t)}">${esc(ini(tn))}</span>`}<div style="flex:1"><p>${txt} <time>${tm(o.created_at)}</time></p></div></li>`}).join('')||'<li class="empty">Check ins, finished pubs, penalties and photos show up here.</li>'}</ul></div>`}
+
+function vRules(){return `<div class="hero"><h1>Cape Town Pub Golf</h1><p>Tee off your Thirst</p><p class="tagline">"Where Skill Meets Chaos"</p></div>
+<div class="card rules"><h3>Basic principles</h3><ul><li>Each pub visited is a hole. Each sip is a stroke.</li><li>Complete the course with the lowest number of strokes possible.</li><li>Teams move together from hole to hole unless told otherwise.</li><li>Each hole has its own par, see the Pubs tab.</li></ul>
+<h3>Scoring</h3><ul><li>Each sip consumed is 1 stroke.</li><li>Penalty strokes are added after the hole is completed.</li><li>Team score is the sum of all individual players' strokes.</li><li>Lowest total team score wins. Tie breaker: playoff hole.</li></ul></div>
+<div class="card rules"><h3>Penalties</h3><p class="note" style="margin:0 0 6px">Assessed by referees.</p><table class="pt">${PENS.map(x=>`<tr><td>${esc(x[1])}</td><td>+${x[2]}</td></tr>`).join('')}</table></div>
+<div class="card rules"><h3>Special holes</h3><ul><li><b>Hole 4, water hazard:</b> no toilets allowed.</li><li><b>Hole 7, dogleg:</b> drink with your weak hand only.</li></ul>
+<h3>Referees</h3><ul><li>Referees are the final authority.</li><li>Referees may give extra penalties for ungentlemanly behaviour or general chaos.</li><li>Bribery attempts are +2 strokes.</li><li>Referees must stay sober enough to enforce the law.</li></ul>
+<h3>Safety and respect</h3><ul><li>Know your limits. Drink water between holes.</li><li>No physical aggression, unless mild wrestling is clearly consensual.</li><li>Respect the staff and the public. Referee penalties apply for misconduct.</li></ul></div>`}
+
+function vTop(){const t=myTeam(),m=me();return `<div class="in"><h1>${esc(S.game?S.game.name:'Pub Golf')}<small>${t?`<span class="dot" style="background:${col(t)};width:9px;height:9px"></span> ${esc(t.name)}, `:''}${esc(m?m.name:'')}</small></h1>
 <button class="ib" data-act="invite">Invite</button><button class="ib" data-act="sheet" aria-label="Profile and team">${m?esc(ini(m.name)):'Me'}</button></div>`}
 function vSheet(){const m=me(),t=myTeam();if(!m||!t)return '';const ms=members(t.id),sharing=ls.get('bg-loc')==='1';
   return `<div class="ov" data-act="closeov"><div class="sheet" role="dialog" aria-modal="true">
@@ -287,125 +408,150 @@ function vSheet(){const m=me(),t=myTeam();if(!m||!t)return '';const ms=members(t
 <div class="chips">${ms.map(p=>`<span class="chip x">${esc(p.name)}${p.id===m.id?' (you)':`<button data-act="rm" data-p="${esc(p.id)}" aria-label="Remove ${esc(p.name)}">×</button>`}</span>`).join('')}</div>
 <form id="fMate"><input id="mate" maxlength="20" placeholder="Add a teammate" required><button class="btn ghost">Add</button></form>
 <h2>Location</h2>
-<label class="sw"><span>Share my live location on the map while the app is open</span><input type="checkbox" id="locSw" ${sharing?'checked':''}></label>
+<label class="sw"><span>Share my live location on the Live map while the app is open</span><input type="checkbox" id="locSw" ${sharing?'checked':''}></label>
 <h2>Game</h2><p class="note" style="margin-bottom:10px">Code <b>${esc(code)}</b>. Anyone with the link can join.</p>
 <div class="act"><button class="btn ghost" data-act="switch">Switch player</button><button class="btn ghost" data-act="leave">Leave game</button></div>
 <div class="act" style="grid-template-columns:1fr"><button class="btn ghost" data-act="closeov">Close</button></div></div></div>`}
-function ask(text,fn){$('#ovl').innerHTML=`<div class="ov dlg"><div class="card" role="dialog" aria-modal="true"><p>${esc(text)}</p><div class="act"><button class="btn ghost" data-act="dno">Cancel</button><button class="btn red" data-act="dyes">Yes</button></div></div></div>`;askFn=fn;sheet=null}
+let penHole=0,penPid=null;
+function vPen(){const i=penHole,b=bar(i),mt=myTeam();
+  const order=[...S.teams].sort((a,c)=>(c.id===(mt&&mt.id))-(a.id===(mt&&mt.id)));
+  const list=S.posts.filter(o=>isPen(o)&&o.hole===i),pm=Object.fromEntries(S.players.map(p=>[p.id,p]));
+  return `<div class="ov" data-act="closeov"><div class="sheet" role="dialog" aria-modal="true"><h2 style="margin-top:0">Penalty at ${esc(b.name)}</h2>
+<p class="note">1. Who gets it?</p>${order.map(t=>`<div class="chips">${members(t.id).map(p=>`<button class="chip" data-act="penp" data-p="${esc(p.id)}" aria-pressed="${p.id===penPid}"><span class="dot" style="background:${col(t)}"></span>${esc(p.name)}</button>`).join('')}</div>`).join('')}
+<p class="note" style="margin-top:14px">2. What happened?</p><div class="penlist">${PENS.map(x=>`<button data-act="penadd" data-k="${x[0]}" ${penPid?'':'disabled style="opacity:.5"'}><span>${esc(x[1])}</span><b>+${x[2]}</b></button>`).join('')}</div>
+${list.length?`<h2>Given at this pub</h2><div class="chips">${list.map(o=>`<span class="chip x">${esc((pm[o.player_id]||{}).name||'Someone')}: ${esc(penName(o))} +${+o.sips}<button data-act="penrm" data-id="${esc(o.id)}" aria-label="Remove penalty">×</button></span>`).join('')}</div>`:''}
+<div class="act" style="grid-template-columns:1fr"><button class="btn ghost" data-act="closeov">Done</button></div></div></div>`}
 let askFn=null;
+function ask(text,fn){$('#ovl').innerHTML=`<div class="ov dlg"><div class="card" role="dialog" aria-modal="true"><p>${esc(text)}</p><div class="act"><button class="btn ghost" data-act="dno">Cancel</button><button class="btn red" data-act="dyes">Yes</button></div></div></div>`;askFn=fn;sheet='ask'}
 
 /* ---------- render ---------- */
 function render(){
   const a=document.activeElement;
-  if(a&&a.tagName==='INPUT'&&(a.closest('#view')||a.closest('#ovl'))){needRender=true;return}
+  if(a&&(a.tagName==='INPUT'||a.tagName==='SELECT')&&(a.closest('#view')||a.closest('#ovl'))){needRender=true;return}
   needRender=false;
   const v=$('#view');let screen;
   if(!configured)screen='setup';else if(!code)screen='start';else if(!me()||!myTeam())screen='who';else screen='main';
   const main=screen==='main';
   $('#topbar').hidden=!main;$('#nav').hidden=!main;v.className=main?'':'full';
-  if(main){$('#topbar').className='top';$('#topbar').innerHTML=vTop();
-    document.querySelectorAll('nav button').forEach(b=>b.setAttribute('aria-current',b.dataset.tab===tab));}
-  const showMap=main&&tab==='map';$('#mapWrap').hidden=!showMap;v.hidden=showMap;
+  if(main){$('#topbar').className='top';$('#topbar').innerHTML=vTop();document.querySelectorAll('nav button').forEach(b=>b.setAttribute('aria-current',b.dataset.tab===tab))}
+  const showMap=main&&tab==='live';$('#mapWrap').hidden=!showMap;
   if(screen==='setup')v.innerHTML=vSetup();else if(screen==='start')v.innerHTML=vStart();else if(screen==='who')v.innerHTML=vWho();
-  else if(tab==='holes')v.innerHTML=vHoles();else if(tab==='board')v.innerHTML=vBoard();else if(tab==='feed')v.innerHTML=vFeed();
+  else v.innerHTML=({pubs:vPubs,board:vBoard,photos:vPhotos,live:vLive,rules:vRules})[tab]();
   if(showMap)drawMap();
-  if(sheet==='me')$('#ovl').innerHTML=main?vSheet():'';
+  if(!main&&sheet&&sheet!=='ask'){sheet=null;$('#ovl').innerHTML=''}
+  if(main){if(sheet==='me')$('#ovl').innerHTML=vSheet();else if(sheet==='pen')$('#ovl').innerHTML=vPen();else if(sheet&&sheet.startsWith('view:'))$('#ovl').innerHTML=vViewer(sheet.slice(5))||'';}
 }
-document.addEventListener('focusout',()=>setTimeout(()=>{const a=document.activeElement;if(needRender&&!(a&&a.tagName==='INPUT'))render()},0));
+document.addEventListener('focusout',()=>setTimeout(()=>{const a=document.activeElement;if(needRender&&!(a&&(a.tagName==='INPUT'||a.tagName==='SELECT')))render()},0));
+const closeOv=()=>{sheet=null;$('#ovl').innerHTML='';if(needRender)render()};
 
 /* ---------- map ---------- */
 let map=null,layer=null;
 function drawMap(){
-  if(!window.L){$('#mapbar').innerHTML='<span>The map needs an internet connection.</span>';return}
-  if(!map){map=L.map('map',{zoomControl:false,attributionControl:true});
+  if(!window.L){$('#map').innerHTML='<p class="empty" style="padding:16px">The map needs an internet connection.</p>';return}
+  if(!map){map=L.map('map',{zoomControl:false});
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap &copy; CARTO'}).addTo(map);
-    map.fitBounds(H.map(h=>[h.b.lat,h.b.lng]),{padding:[30,30]});layer=L.layerGroup().addTo(map)}
-  setTimeout(()=>map.invalidateSize(),50);
+    map.fitBounds(H.map(h=>[h.b.lat,h.b.lng]),{padding:[24,24]});layer=L.layerGroup().addTo(map)}
+  setTimeout(()=>map.invalidateSize(),60);
   layer.clearLayers();
   const pts=H.map((h,i)=>bar(i));
-  L.polyline(pts.map(b=>[b.lat,b.lng]),{color:'#0f4a33',weight:3,dashArray:'2 8',opacity:.8}).addTo(layer);
   pts.forEach((b,i)=>L.marker([b.lat,b.lng],{icon:L.divIcon({className:'',html:`<div class="pin">${i+1}</div>`,iconSize:[30,30],iconAnchor:[15,15]})}).bindPopup(`<b>${i+1}. ${esc(b.name)}</b><br>${esc(H[i].drink)}, par ${H[i].par}`).addTo(layer));
-  const byHole={};S.teams.forEach(t=>{const l=locOf(t)!=null?locOf(t):curOf(t)<9&&Object.keys(doneOf(t)).length?curOf(t):null;if(l!=null)(byHole[l]=byHole[l]||[]).push(t)});
-  Object.entries(byHole).forEach(([i,ts])=>{const b=pts[i];ts.forEach((t,k)=>L.marker([b.lat,b.lng],{icon:L.divIcon({className:'',html:`<span class="tpin" style="background:${col(t)}">${esc(t.name)}${locOf(t)==null?' →':''}</span>`,iconSize:null,iconAnchor:[-18,10-k*22]}),zIndexOffset:500}).addTo(layer))});
+  const byHole={};S.teams.forEach(t=>{const l=locOf(t);if(l!=null)(byHole[l]=byHole[l]||[]).push([t,0]);else{const {last}=lastDone(t);if(last>=0)(byHole[last]=byHole[last]||[]).push([t,1])}});
+  Object.entries(byHole).forEach(([i,ts])=>{const b=pts[i];ts.forEach(([t,left],k)=>L.marker([b.lat,b.lng],{icon:L.divIcon({className:'',html:`<span class="tpin${left?' left':''}" style="background:${col(t)}">${esc(t.name)}${left?' (left)':''}</span>`,iconSize:null,iconAnchor:[-18,10-k*22]}),zIndexOffset:500}).addTo(layer))});
   const fresh=Date.now()-20*60e3;let live=0;
   S.players.forEach(p=>{const l=p.loc;if(!l||!(+l.t>fresh)||!isFinite(+l.lat))return;live++;const t=S.teams.find(x=>x.id===p.team_id);
     L.circleMarker([+l.lat,+l.lng],{radius:8,color:'#fff',weight:2,fillColor:col(t),fillOpacity:1}).bindTooltip(`${esc(p.name)}, ${tm(+l.t)}`,{permanent:true,direction:'top',offset:[0,-8]}).addTo(layer)});
   const sharing=ls.get('bg-loc')==='1';
-  $('#mapbar').innerHTML=`<span>${live?`${live} live location${live>1?'s':''}. `:''}Team labels show where each team is checked in, an arrow means on the way.</span><button class="btn ${sharing?'ghost':''}" data-act="loc">${sharing?'Stop sharing':'Share my location'}</button>`;
+  $('#mapbar').innerHTML=`<span>${live?`${live} live location${live>1?'s':''}. `:''}Team labels show the pub each team is at.</span><button class="btn ${sharing?'ghost':''}" data-act="loc">${sharing?'Stop sharing':'Share my location'}</button>`;
 }
 let watch=null,lastLoc=null;
 function setSharing(on){ls.set('bg-loc',on?'1':null);
   if(watch!=null){navigator.geolocation.clearWatch(watch);watch=null}
   const m=me();
-  if(!on){if(m)run(sb.from('players').update({loc:null}).eq('id',m.id));render();return}
+  if(!on){if(m)save(()=>sb.from('players').update({loc:null}).eq('id',m.id));render();return}
   if(!navigator.geolocation){toast('This phone does not offer location.');ls.set('bg-loc',null);return}
   watch=navigator.geolocation.watchPosition(pos=>{const m=me();if(!m)return;const {latitude:lat,longitude:lng}=pos.coords,now=Date.now();
     if(lastLoc&&now-lastLoc.t<40000&&Math.hypot((lat-lastLoc.lat)*111e3,(lng-lastLoc.lng)*92e3)<30)return;
-    lastLoc={lat,lng,t:now};m.loc=lastLoc;run(sb.from('players').update({loc:lastLoc}).eq('id',m.id));if(tab==='map')render()},
-    ()=>{toast('Location is blocked. Allow it for this app in your phone settings.');ls.set('bg-loc',null);render()},{enableHighAccuracy:true,maximumAge:20000});
+    lastLoc={lat,lng,t:now};m.loc=lastLoc;save(()=>sb.from('players').update({loc:lastLoc}).eq('id',m.id),'Location not shared');if(tab==='live')render()},
+    ()=>{toast('Location is blocked. Allow it in Settings, Privacy, Location Services.');ls.set('bg-loc',null);render()},{enableHighAccuracy:true,maximumAge:20000});
   render();
 }
 
 /* ---------- actions ---------- */
 let photoHole=0,avatarMode=false;
 function openGame(c){code=String(c).toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,8);if(!code)return;ls.set('bg-last',code);
-  history.replaceState(null,'','?g='+code);S.loaded=false;S.game=null;render();load();subscribe();if(ls.get('bg-loc')==='1')setSharing(true)}
+  try{history.replaceState(null,'','?g='+code)}catch(e){}
+  S.loaded=false;S.game=null;S.teams=[];S.players=[];S.posts=[];selHole=null;render();load();subscribe();if(ls.get('bg-loc')==='1')setTimeout(()=>setSharing(true),1500)}
 document.addEventListener('click',async e=>{
   const nb=e.target.closest('nav button');if(nb){tab=nb.dataset.tab;ls.set('bg-tab',tab);render();scrollTo(0,0);return}
   const el=e.target.closest('[data-act]');if(!el)return;const a=el.dataset.act,i=+el.dataset.i;
-  if(a==='closeov'){if(e.target!==el)return;sheet=null;$('#ovl').innerHTML='';needRender&&render();return}
-  if(a==='dno'){$('#ovl').innerHTML='';askFn=null;return}
-  if(a==='dyes'){const f=askFn;$('#ovl').innerHTML='';askFn=null;f&&f();return}
+  if(a==='closeov'){if(e.target!==el)return;closeOv();return}
+  if(a==='dno'){askFn=null;closeOv();return}
+  if(a==='dyes'){const f=askFn;askFn=null;closeOv();f&&f();return}
   if(a==='open')return openGame(el.dataset.code);
   if(a==='claim'){ls.set('bg-me-'+code,el.dataset.p);render();return}
-  if(a==='leave'){ask('Leave this game on this phone? Your scores stay saved.',()=>{if(watch!=null)navigator.geolocation.clearWatch(watch);watch=null;if(chan)sb.removeChannel(chan);chan=null;code=null;sheet=null;history.replaceState(null,'',location.pathname);ls.set('bg-last',null);render()});return}
-  if(a==='switch'){ls.set('bg-me-'+code,null);sheet=null;$('#ovl').innerHTML='';render();return}
+  if(a==='leave'){ask('Leave this game on this phone? Your scores stay saved.',()=>{if(watch!=null)navigator.geolocation.clearWatch(watch);watch=null;if(chan)sb.removeChannel(chan);chan=null;code=null;recent=null;try{history.replaceState(null,'',location.pathname)}catch(e){}ls.set('bg-last',null);render()});return}
+  if(a==='switch'){ls.set('bg-me-'+code,null);closeOv();render();return}
   if(a==='sheet'){sheet='me';render();return}
-  if(a==='invite'){const u=shareUrl();try{if(navigator.share){await navigator.share({title:S.game?S.game.name:'Bar Golf',text:'Join our Bar Golf game',url:u});return}}catch(err){return}
+  if(a==='invite'){const u=shareUrl();try{if(navigator.share){await navigator.share({title:S.game?S.game.name:'Pub Golf',text:'Join our Pub Golf game',url:u});return}}catch(err){return}
     try{await navigator.clipboard.writeText(u);toast('Link copied. Send it to the group.')}catch(err){toast(u)}return}
   const t=myTeam();
-  if(a==='step'){const p=S.players.find(x=>x.id===el.dataset.p);if(!p)return;const s={...scoresOf(p)},v=s[i],d=+el.dataset.d;
-    if(v==null){if(d<0)return;s[i]=1}else if(v+d<1)delete s[i];else s[i]=v+d;savePlayerScores(p,s);return}
-  if(a==='here'&&t){await patchTeam(t,{here:{h:i,t:Date.now()}});post({team_id:t.id,player_id:meId(),kind:'here',hole:i});return}
-  if(a==='done'&&t){const d={...doneOf(t)};if(d[i]){delete d[i];patchTeam(t,{done:d});return}
-    d[i]=Date.now();const sips=members(t.id).reduce((s,p)=>s+(+scoresOf(p)[i]||0),0);
-    await patchTeam(t,{done:d,here:null});post({team_id:t.id,player_id:meId(),kind:'done',hole:i,sips});
-    const n=curOf(t);if(n<9&&tab==='holes')setTimeout(()=>{const x=document.getElementById('h'+(n+1));if(x)x.scrollIntoView({behavior:reduce?'auto':'smooth',block:'start'})},80);return}
-  if(a==='h5'){const v=el.dataset.v;if(S.game.h5!==v){S.game.h5=v;render();run(sb.from('games').update({h5:v}).eq('id',code))}return}
+  if(a==='pick'){selHole=i;render();return}
+  if(a==='step'){const p=S.players.find(x=>x.id===el.dataset.p);if(!p)return;const v=scoresOf(p)[i],d=+el.dataset.d;
+    if(v==null){if(d<0)return;setScore(p,i,1)}else if(v+d<1)setScore(p,i,null);else setScore(p,i,v+d);return}
+  if(a==='here'&&t){selHole=i;t.here={h:i,t:Date.now()};render();
+    save(()=>sb.from('teams').update({here:t.here}).eq('id',t.id),'Check in not saved');post({team_id:t.id,player_id:meId(),kind:'here',hole:i});return}
+  if(a==='done'&&t){if(doneOf(t)[i]){setDone(t,i,false);return}
+    const sips=members(t.id).reduce((s,p)=>s+(+scoresOf(p)[i]||0),0);
+    if(!sips){ask('Nobody has a score at this pub yet. Mark it as done anyway?',async()=>{await setDone(t,i,true);post({team_id:t.id,player_id:meId(),kind:'done',hole:i,sips:0});selHole=null;render();scrollTo(0,0)});return}
+    await setDone(t,i,true);post({team_id:t.id,player_id:meId(),kind:'done',hole:i,sips});selHole=null;render();scrollTo({top:0,behavior:'smooth'});toast('Nice! Pick your next pub.');return}
+  if(a==='h5'){const v=el.dataset.v;if(S.game.h5!==v){S.game.h5=v;render();save(()=>sb.from('games').update({h5:v}).eq('id',code))}return}
+  if(a==='pen'){penHole=i;penPid=null;sheet='pen';render();return}
+  if(a==='penp'){penPid=el.dataset.p;render();return}
+  if(a==='penadd'){const x=PENMAP[el.dataset.k],p=S.players.find(y=>y.id===penPid);if(!x||!p)return;
+    post({team_id:p.team_id,player_id:p.id,kind:'pen:'+x[0],hole:penHole,sips:x[2]});toast(`${p.name} +${x[2]}: ${x[1]}`);return}
+  if(a==='penrm'){const id=el.dataset.id;S.posts=S.posts.filter(o=>o.id!==id);render();save(()=>sb.from('posts').delete().eq('id',id));return}
+  if(a==='sct'){scTeam=el.dataset.t;render();return}
+  if(a==='view'){sheet='view:'+el.dataset.id;render();return}
+  if(a==='delphoto'){const id=el.dataset.id;ask('Delete this photo for everyone?',()=>{S.posts=S.posts.filter(o=>o.id!==id);render();save(()=>sb.from('posts').delete().eq('id',id))});return}
   if(a==='photo'){photoHole=i;avatarMode=false;$('#file').click();return}
   if(a==='avatar'){avatarMode=true;$('#file').click();return}
-  if(a==='rm'){const p=S.players.find(x=>x.id===el.dataset.p);if(p)ask(`Remove ${p.name} from the team?`,()=>{S.players=S.players.filter(x=>x.id!==p.id);render();run(sb.from('players').delete().eq('id',p.id))});return}
+  if(a==='rm'){const p=S.players.find(x=>x.id===el.dataset.p);if(p)ask(`Remove ${p.name} from the team?`,()=>{S.players=S.players.filter(x=>x.id!==p.id);render();save(()=>sb.from('players').delete().eq('id',p.id))});return}
   if(a==='loc'){setSharing(ls.get('bg-loc')!=='1');return}
 });
-document.addEventListener('change',e=>{if(e.target.id==='locSw')setSharing(e.target.checked)});
+document.addEventListener('change',e=>{if(e.target.id==='locSw')setSharing(e.target.checked);if(e.target.id==='phHole')phHole=+e.target.value});
 $('#file').addEventListener('change',async e=>{const f=e.target.files[0];e.target.value='';const m=me(),t=myTeam();if(!f||!m)return;
   toast('Uploading photo…');
-  try{if(avatarMode){const url=await upload(f,320);m.avatar=url;render();await run(sb.from('players').update({avatar:url}).eq('id',m.id));toast('Profile photo saved.')}
+  try{if(avatarMode){const url=await upload(f,320);m.avatar=url;render();await save(()=>sb.from('players').update({avatar:url}).eq('id',m.id));toast('Profile photo saved.')}
     else{const url=await upload(f,1400);await post({team_id:t&&t.id,player_id:m.id,kind:'photo',hole:photoHole,photo:url});toast('Photo posted.')}}
-  catch(err){console.error(err);toast('The photo could not be uploaded. Try again.')}});
+  catch(err){console.error(err);toast('Photo not uploaded: '+em(err))}});
 document.addEventListener('submit',async e=>{
-  e.preventDefault();const f=e.target,val=s=>(f.querySelector(s)||{}).value?.trim()||'';
+  e.preventDefault();const f=e.target,val=s=>((f.querySelector(s)||{}).value||'').trim();
+  if(f.id==='fPhoto'){photoHole=+$('#phHole').value;phHole=photoHole;avatarMode=false;$('#file').click();return}
   if(f.id==='fNew'){const name=val('#gName');if(!name)return;const c=Array.from({length:5},()=>'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[Math.random()*31|0]).join('');
-    try{await q(sb.from('games').insert({id:c,name,h5:'yt'}));openGame(c);toast('Game created. Tap Invite to share it.')}catch(err){console.error(err);toast('Could not create the game. Check the setup.')}return}
-  if(f.id==='fJoin'){openGame(val('#gCode'));return}
+    try{await q(sb.from('games').insert({id:c,name,h5:'yt'}));f.querySelector('input').blur();openGame(c);toast('Game created. Tap Invite to share it.')}catch(err){console.error(err);toast('Could not create the game: '+em(err))}return}
+  if(f.id==='fJoin'){f.querySelector('input').blur();openGame(val('#gCode'));return}
   if(f.id==='fTeam'){const tn=val('#tName'),pn=val('#tMe');if(!tn||!pn)return;const tid=uid(),pid=uid();
     const used=S.teams.map(t=>+t.color);let c=0;while(used.includes(c)&&c<COLORS.length-1)c++;
     try{await q(sb.from('teams').insert({id:tid,game_id:code,name:tn,color:c,done:{}}));await q(sb.from('players').insert({id:pid,game_id:code,team_id:tid,name:pn,scores:{}}));
-      ls.set('bg-me-'+code,pid);f.reset();await load()}catch(err){console.error(err);toast('Could not create the team.')}return}
+      ls.set('bg-me-'+code,pid);f.reset();document.activeElement&&document.activeElement.blur();await load()}catch(err){console.error(err);toast('Could not create the team: '+em(err))}return}
   if(f.dataset.form==='addme'){const pn=f.querySelector('input').value.trim();if(!pn)return;const pid=uid();
-    try{await q(sb.from('players').insert({id:pid,game_id:code,team_id:f.dataset.t,name:pn,scores:{}}));ls.set('bg-me-'+code,pid);f.reset();await load()}catch(err){toast('Could not join the team.')}return}
+    try{await q(sb.from('players').insert({id:pid,game_id:code,team_id:f.dataset.t,name:pn,scores:{}}));ls.set('bg-me-'+code,pid);f.reset();document.activeElement&&document.activeElement.blur();await load()}catch(err){toast('Could not join the team: '+em(err))}return}
   const m=me(),t=myTeam();if(!m||!t)return;
-  if(f.id==='fName'){const n=val('#meName');if(n&&n!==m.name){m.name=n;f.querySelector('input').blur();render();run(sb.from('players').update({name:n}).eq('id',m.id));toast('Name saved.')}return}
-  if(f.id==='fTName'){const n=val('#teamName');if(n&&n!==t.name){f.querySelector('input').blur();patchTeam(t,{name:n});toast('Team renamed.')}return}
+  if(f.id==='fName'){const n=val('#meName');f.querySelector('input').blur();if(n&&n!==m.name){m.name=n;render();save(()=>sb.from('players').update({name:n}).eq('id',m.id));toast('Name saved.')}return}
+  if(f.id==='fTName'){const n=val('#teamName');f.querySelector('input').blur();if(n&&n!==t.name){t.name=n;render();save(()=>sb.from('teams').update({name:n}).eq('id',t.id));toast('Team renamed.')}return}
   if(f.id==='fMate'){const n=val('#mate');if(!n)return;const row={id:uid(),game_id:code,team_id:t.id,name:n,scores:{}};
-    S.players.push({...row,created_at:new Date().toISOString()});f.querySelector('input').value='';f.querySelector('input').blur();render();run(sb.from('players').insert(row))}
+    S.players.push({...row,created_at:new Date().toISOString()});f.querySelector('input').value='';f.querySelector('input').blur();render();save(()=>sb.from('players').insert(row),'Teammate not added')}
 });
 
 /* ---------- start ---------- */
 if(configured&&window.supabase){sb=window.supabase.createClient(CFG.url,CFG.key);
   const c=new URLSearchParams(location.search).get('g')||ls.get('bg-last');if(c)openGame(c);else render()}
 else render();
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&code)load()});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&code){load();flushAll()}});
+addEventListener('online',()=>{setNet(true);if(code){load();flushAll()}});
+addEventListener('offline',()=>setNet(false));
+// safety net in case live updates drop (bad signal in bars): refresh every 15 s while open
+setInterval(()=>{if(code&&document.visibilityState==='visible')load()},15000);
 if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});
 }
 </script>
